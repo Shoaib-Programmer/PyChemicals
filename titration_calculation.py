@@ -4,7 +4,7 @@ from predefined_chemicals import valid_acids, valid_bases
 from chempy import balance_stoichiometry
 
 class Analyte(Chemical):
-    def __init__(self, name: str, volume: float = None):
+    def __init__(self, name: str, volume: float = None, titrant=None):
         if name in valid_acids:
             super().__init__(name=name, concentration=None, volume=volume)
             self.__class__ = Acid  # Change the class type to Acid
@@ -14,8 +14,18 @@ class Analyte(Chemical):
         else:
             super().__init__(name=name, concentration=None, volume=volume)
 
+        if titrant is not None:
+            self.validate_titrant(titrant)
+
+    def validate_titrant(self, titrant):
+        if isinstance(titrant, Acid) and isinstance(self, Acid):
+            raise ValueError("Both Analyte and Titrant cannot be acids.")
+        elif isinstance(titrant, Base) and isinstance(self, Base):
+            raise ValueError("Both Analyte and Titrant cannot be bases.")
+
+
 class Titrant(Chemical):
-    def __init__(self, name: str, concentration: float = None, volume: float = None):
+    def __init__(self, name: str, concentration: float = None, volume: float = None, analyte=None):
         if name in valid_acids:
             super().__init__(name=name, concentration=concentration, volume=volume)
             self.__class__ = Acid  # Change the class type to Acid
@@ -24,6 +34,16 @@ class Titrant(Chemical):
             self.__class__ = Base  # Change the class type to Base
         else:
             super().__init__(name=name, concentration=concentration, volume=volume)
+
+        if analyte is not None:
+            self.validate_analyte(analyte)
+
+    def validate_analyte(self, analyte):
+        if isinstance(analyte, Acid) and isinstance(self, Acid):
+            raise ValueError("Both Analyte and Titrant cannot be acids.")
+        elif isinstance(analyte, Base) and isinstance(self, Base):
+            raise ValueError("Both Analyte and Titrant cannot be bases.")
+
 
 
 def volume_of_titrant(analyte: Analyte, titrant: Titrant, stoichiometric_ratio: float = 1.0):
