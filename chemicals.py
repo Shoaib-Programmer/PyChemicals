@@ -1,5 +1,5 @@
 import numpy as np
-from .predefined_chemicals import valid_acids, valid_bases
+from predefined_chemicals import valid_acids, valid_bases, valid_gases
 
 class Chemical:
     def __init__(self, name: str, concentration: float = None, volume: float = None, mass: float = None):
@@ -39,24 +39,31 @@ class Acid(Chemical):
         if self.mass is None:
             return self.concentration * self.volume * self.Mr
 
+    import numpy as np
+
     def H_plus(self):
         if self.ka > 1:
             return self.concentration
         else:
             if self.concentration is None:
-                return None  # Need the concentration to calculate H_plus
+                return None  # Need the concentration to calculate H+
 
             C = self.concentration
             Ka = self.ka
 
-            # Solving the quadratic equation for [H+]
-            discriminant = Ka**2 + 4 * Ka * C
+            # Coefficients for the quadratic equation [H+]^2 + Ka[H+] - KaC = 0
+            a = 1
+            b = Ka
+            c = -Ka * C
+
+            discriminant = b**2 - 4 * a * c
             if discriminant < 0:
                 raise ValueError("Discriminant is negative; check the values of Ka and concentration.")
 
             # Positive root
-            H_plus = (-Ka + np.sqrt(discriminant)) / 2
+            H_plus = (-b + np.sqrt(discriminant)) / (2 * a)
             return H_plus
+
 
     @staticmethod
     def calculate_temp_dependence(K_initial, T_initial, T_final, delta_H):
@@ -202,6 +209,8 @@ class Gas(Chemical):
     R = 0.0821  # Ideal gas constant in L·atm/(K·mol)
 
     def __init__(self, name: str, pressure: float = None, temperature: float = None, volume: float = None, mass: float = None):
+        if name not in valid_gases:
+            raise ValueError(f"Invalid gas: {name}")
         super().__init__(name, volume=volume, mass=mass)  # Call to the parent constructor
         self.pressure = pressure  # Pressure in atm
         self.temperature = temperature  # Temperature in Kelvin
@@ -252,3 +261,9 @@ class Gas(Chemical):
 
     def __repr__(self):
         return f"{self.name}: {self.pressure} atm, {self.temperature} K, {self.volume} L"
+
+if __name__ == "__main__":
+    # Implement test runs
+    hcl = Acid(name="Hydrochloric Acid", concentration=0.3)
+    print(hcl.pH())
+    ...
