@@ -1,7 +1,10 @@
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-from .chemicals import Chemical, Acid, Base
-from .titration_calculation import volume_of_titrant, Analyte, Titrant
+from chemicals import Chemical, Acid, Base
+from titration_calculation import volume_of_titrant, Analyte, Titrant
+
+matplotlib.use("tkAgg")  # or use 'Qt5Agg'
 
 def titrate_curve_monoprotic(analyte: Analyte, titrant: Titrant):
     if analyte.volume is None:
@@ -17,7 +20,7 @@ def titrate_curve_monoprotic(analyte: Analyte, titrant: Titrant):
     V_eqv = volume_of_titrant(analyte, titrant)
 
     # Define volumes to add titrant, from 0 to a bit beyond equivalence point
-    V_added = np.linspace(0, 1.5 * V_eqv, 500)
+    V_added = np.linspace(0, 2 * V_eqv, 500)
 
     pH = []
 
@@ -71,12 +74,17 @@ def titrate_curve_monoprotic(analyte: Analyte, titrant: Titrant):
 
     # Plot the titration curve
     plt.figure(figsize=(8, 5))
-    plt.plot(V_added, pH, label=f"{analyte.name} ({C_acid} M) titrated with {titrant.name} ({C_base} M)")
-    plt.axvline(x=V_eqv, color='r', linestyle='--', label='Equivalence Point')
+    plt.plot(V_added * 1000, pH, label=f"{analyte.volume * 1000}mL {analyte.name} ({C_acid} M) titrated with {titrant.name} ({C_base} M)")
+    plt.axvline(x=V_eqv * 1000, color='r', linestyle='--', label='Equivalence Point')
     plt.axhline(y=7, color='g', linestyle='--', label='pH = 7 at Equivalence')
-    plt.xlabel(f'Volume of {titrant.name} added (Litres)')
+    plt.xlabel(f'Volume of {titrant.name} added (mL)')
     plt.ylabel('pH')
     plt.title('Titration Curve')
     plt.legend()
     plt.grid(True)
     plt.show()
+
+if __name__ == "__main__":
+    hcl = Acid(name="Hydrochloric Acid", concentration=0.1, volume=0.2)
+    naoh = Base(name="Sodium Hydroxide", concentration=0.2, volume=0.1)
+    titrate_curve_monoprotic(hcl, naoh)
