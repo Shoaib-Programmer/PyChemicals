@@ -1,7 +1,6 @@
 import numpy as np
 from chemicals import Acid, Base, Chemical
 from predefined_chemicals import valid_acids, valid_bases
-from chempy import balance_stoichiometry
 
 class Analyte(Chemical):
     def __init__(self, name: str, volume: float = None, titrant=None):
@@ -43,6 +42,19 @@ class Titrant(Chemical):
             raise ValueError("Both Analyte and Titrant cannot be acids.")
         elif isinstance(analyte, Base) and isinstance(self, Base):
             raise ValueError("Both Analyte and Titrant cannot be bases.")
+        
+
+def strength(analyte: Analyte):
+    if isinstance(analyte, Acid):
+        if analyte.ka > 1:
+            return "strong acid"
+        else:
+            return "weak acid"
+    elif isinstance(analyte, Base):
+        if analyte.kb > 1:
+            return "strong base"
+        else:
+            return "weak base"
 
 
 
@@ -130,20 +142,13 @@ def pH_at_equivalence(analyte: Analyte, titrant: Titrant):
     return None  # Default case, return None if no specific pH calculation is done
 
 
-def calculate_pH(acid, volume_added):
-    """Calculate pH at different volumes of titrant added."""
-    # Implement using the Henderson-Hasselbalch equation for weak acids/bases
-    if isinstance(acid, Acid):
-        # Assuming strong acid vs weak base or similar logic
-        return acid.calculate_pH()
-    return None
-
-def calculate_half_equivalence(acid):
+def calculate_half_equivalence(analyte, titrant):
     """Calculate pH at the half-equivalence point."""
     ...
+    
 
 
-def pH_after_equivalence(acid : Acid, base: Base, excess_volume):
+def pH_after_equivalence(acid : Acid, base: Base, excess_volume) -> float:
     """Calculate pH after reaching the equivalence point."""
     if isinstance(acid, Acid) and isinstance(base, Base):
         if base.concentration > acid.concentration:
