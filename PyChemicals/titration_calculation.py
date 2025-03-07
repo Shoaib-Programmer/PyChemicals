@@ -14,7 +14,9 @@ from .predefined_chemicals import valid_acids, valid_bases
 class Analyte(Chemical):
     """Class representing an analyte in a titration process."""
 
-    def __init__(self, name: str, volume: float = None, concentration: float = None, titrant=None):
+    def __init__(
+        self, name: str, volume: float = None, concentration: float = None, titrant=None
+    ):
         """
         Initialize an Analyte instance.
 
@@ -25,7 +27,6 @@ class Analyte(Chemical):
             titrant (optional): Titrant used in the titration.
         """
         super().__init__(name=name, concentration=concentration, volume=volume)
-        
         if name in valid_acids:
             self.__class__ = Acid
             self.__init__(name=name, concentration=concentration, volume=volume)
@@ -144,12 +145,14 @@ def volume_of_titrant(
 
     moles_analyte = analyte.concentration * analyte.volume
     moles_titrant_needed = moles_analyte / stoichiometric_ratio
-    
+
     # For diprotic acids/bases, adjust the volume based on the dissociation step
     if isinstance(analyte, (Acid, Base)) and analyte.proticity == 2:
         if stoichiometric_ratio == 2.0:
-            moles_titrant_needed *= 2  # Double the moles needed for complete neutralization
-    
+            moles_titrant_needed *= (
+                2  # Double the moles needed for complete neutralization
+            )
+
     volume_titrant_needed = moles_titrant_needed / titrant.concentration
     return volume_titrant_needed
 
@@ -240,7 +243,7 @@ def ph_after_equivalence(acid: Acid, base: Base, excess_volume: float) -> float:
     if acid.ka < 1:  # Weak acid
         if excess_volume == acid.volume / 2:  # At half-equivalence
             return acid.pka()
-        
+
         # Calculate concentration of remaining acid and conjugate base
         total_volume = acid.volume + excess_volume
         moles_base_added = base.concentration * excess_volume
@@ -248,7 +251,7 @@ def ph_after_equivalence(acid: Acid, base: Base, excess_volume: float) -> float:
         conjugate_base = moles_base_added / total_volume
         if remaining_acid > 0:
             return -np.log10((acid.ka * remaining_acid) / conjugate_base)
-        
+
     # For strong acids and bases, use excess concentration
     moles_base = base.concentration * excess_volume
     total_volume = acid.volume + excess_volume
@@ -256,7 +259,7 @@ def ph_after_equivalence(acid: Acid, base: Base, excess_volume: float) -> float:
     if moles_base > moles_acid:  # After equivalence
         excess_oh = (moles_base - moles_acid) / total_volume
         return 14 + np.log10(excess_oh)
-    
+
     # Before equivalence
     excess_h = (moles_acid - moles_base) / total_volume
     return -np.log10(excess_h)

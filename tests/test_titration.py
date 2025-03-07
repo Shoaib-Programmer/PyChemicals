@@ -26,7 +26,7 @@ def test_ph_after_equivalence():
     """Test pH calculation after equivalence point."""
     hcl = Acid("Hydrochloric Acid", concentration=0.1, volume=0.025)
     naoh = Base("Sodium Hydroxide", concentration=0.1)
-    
+
     # Test after equivalence - use 120% of equivalence volume
     v_eq = volume_of_titrant(hcl, naoh)
     v_after = 1.2 * v_eq  # 20% excess
