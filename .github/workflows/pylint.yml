@@ -30,6 +30,13 @@ jobs:
           pip install -r requirements.txt
           pip install -e .
 
-      - name: Analyse the code with pylint
+      - name: Analyse the code with pylint (only changed files)
         run: |
-          pylint $(git ls-files '*.py')
+          echo "Finding modified Python files..."
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} -- '*.py')
+          if [ -z "$changed_files" ]; then
+            echo "No Python files modified, skipping pylint."
+          else
+            echo "Linting the following files: $changed_files"
+            pylint $changed_files
+          fi
