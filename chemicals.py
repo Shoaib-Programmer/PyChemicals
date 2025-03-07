@@ -1,5 +1,5 @@
 import numpy as np
-from predefined_chemicals import valid_acids, valid_bases, valid_gases
+from .predefined_chemicals import valid_acids, valid_bases, valid_gases
 
 class Chemical:
     def __init__(self, name: str, concentration: float = None, volume: float = None, mass: float = None):

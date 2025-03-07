@@ -130,5 +130,7 @@ valid_bases = {
     }  # Weak base
 }
 
+valid_gases = {}
+
 if __name__ == "__main__":
     print(valid_acids, valid_bases)
