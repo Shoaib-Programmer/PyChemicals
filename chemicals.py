@@ -1,8 +1,15 @@
 import numpy as np
 from .predefined_chemicals import valid_acids, valid_bases, valid_gases
 
+
 class Chemical:
-    def __init__(self, name: str, concentration: float = None, volume: float = None, mass: float = None):
+    def __init__(
+        self,
+        name: str,
+        concentration: float = None,
+        volume: float = None,
+        mass: float = None,
+    ):
         self.name = name
         self.concentration = concentration
         self.volume = volume
@@ -25,8 +32,15 @@ class Chemical:
             return self.concentration * self.volume
         return None
 
+
 class Acid(Chemical):
-    def __init__(self, name: str, concentration: float = None, volume: float = None, mass: float = None):
+    def __init__(
+        self,
+        name: str,
+        concentration: float = None,
+        volume: float = None,
+        mass: float = None,
+    ):
         if name not in valid_acids:
             raise ValueError(f"Unknown acid: {name}")
         super().__init__(name, concentration, volume, mass)
@@ -58,12 +72,13 @@ class Acid(Chemical):
 
             discriminant = b**2 - 4 * a * c
             if discriminant < 0:
-                raise ValueError("Discriminant is negative; check the values of Ka and concentration.")
+                raise ValueError(
+                    "Discriminant is negative; check the values of Ka and concentration."
+                )
 
             # Positive root
             H_plus = (-b + np.sqrt(discriminant)) / (2 * a)
             return H_plus
-
 
     @staticmethod
     def calculate_temp_dependence(K_initial, T_initial, T_final, delta_H):
@@ -81,9 +96,15 @@ class Acid(Chemical):
         return K_final
 
     def validate_acid(self):
-        if self.concentration is not None and self.volume is not None and self.mass is not None:
+        if (
+            self.concentration is not None
+            and self.volume is not None
+            and self.mass is not None
+        ):
             if not self.mass / self.Mr == self.concentration * self.volume:
-                raise ValueError(f"{self.volume}L of {self.concentration}M {self.name} with {self.mass}g cannot physically exist")
+                raise ValueError(
+                    f"{self.volume}L of {self.concentration}M {self.name} with {self.mass}g cannot physically exist"
+                )
 
     def verify_acid_type(self):
         if self.proticity == 1:
@@ -110,10 +131,19 @@ class Acid(Chemical):
 
     def __repr__(self):
         acid_type = self.verify_acid_type()
-        return f"{self.name} ({acid_type}): {self.concentration} M, pKa = {self.pKa():.2f}"
+        return (
+            f"{self.name} ({acid_type}): {self.concentration} M, pKa = {self.pKa():.2f}"
+        )
+
 
 class Base(Chemical):
-    def __init__(self, name: str, concentration: float = None, volume: float = None, mass: float = None):
+    def __init__(
+        self,
+        name: str,
+        concentration: float = None,
+        volume: float = None,
+        mass: float = None,
+    ):
         if name not in valid_bases:
             raise ValueError(f"Unknown base: {name}")
         self.proticity = valid_bases[name]["proticity"]
@@ -123,9 +153,15 @@ class Base(Chemical):
         self.validate_base()
 
     def validate_base(self):
-        if self.concentration is not None and self.volume is not None and self.mass is not None:
+        if (
+            self.concentration is not None
+            and self.volume is not None
+            and self.mass is not None
+        ):
             if not self.mass / self.Mr == self.concentration * self.volume:
-                raise ValueError(f"{self.volume}L of {self.concentration}M {self.name} with {self.mass}g cannot physically exist")
+                raise ValueError(
+                    f"{self.volume}L of {self.concentration}M {self.name} with {self.mass}g cannot physically exist"
+                )
 
     def verify_base_type(self):
         if self.proticity == 1:
@@ -152,7 +188,9 @@ class Base(Chemical):
             # Solving the quadratic equation for [OH-]
             discriminant = Kb**2 + 4 * Kb * C
             if discriminant < 0:
-                raise ValueError("Discriminant is negative; check the values of Kb and concentration.")
+                raise ValueError(
+                    "Discriminant is negative; check the values of Kb and concentration."
+                )
 
             # Positive root
             OH_minus = (-Kb + np.sqrt(discriminant)) / 2
@@ -180,7 +218,9 @@ class Base(Chemical):
     def pOH(self):
         """Calculates pOH for strong and weak bases."""
         if self.kb >= 1e-10:  # For strong bases (complete dissociation)
-            oh_concentration = self.concentration * float(self.proticity)  # 1 mol NaOH gives 1 mol OH-
+            oh_concentration = self.concentration * float(
+                self.proticity
+            )  # 1 mol NaOH gives 1 mol OH-
             return -np.log10(oh_concentration)
         else:  # For weak bases, using the approximation [OH-] = sqrt(Kb * [B])
             if self.concentration:
@@ -202,16 +242,27 @@ class Base(Chemical):
 
     def __repr__(self):
         base_type = self.verify_base_type()
-        return f"{self.name} ({base_type}): {self.concentration} M, pKb = {self.pKb():.2f}"
-    
+        return (
+            f"{self.name} ({base_type}): {self.concentration} M, pKb = {self.pKb():.2f}"
+        )
+
 
 class Gas(Chemical):
     R = 0.0821  # Ideal gas constant in L·atm/(K·mol)
 
-    def __init__(self, name: str, pressure: float = None, temperature: float = None, volume: float = None, mass: float = None):
+    def __init__(
+        self,
+        name: str,
+        pressure: float = None,
+        temperature: float = None,
+        volume: float = None,
+        mass: float = None,
+    ):
         if name not in valid_gases:
             raise ValueError(f"Invalid gas: {name}")
-        super().__init__(name, volume=volume, mass=mass)  # Call to the parent constructor
+        super().__init__(
+            name, volume=volume, mass=mass
+        )  # Call to the parent constructor
         self.pressure = pressure  # Pressure in atm
         self.temperature = temperature  # Temperature in Kelvin
 
@@ -219,14 +270,16 @@ class Gas(Chemical):
         """Calculate volume using the ideal gas law: V = nRT/P."""
         if self.pressure is not None and self.temperature is not None:
             return (moles * self.R * self.temperature) / self.pressure  # V = nRT/P
-        raise ValueError("Pressure and temperature must be defined to calculate volume.")
+        raise ValueError(
+            "Pressure and temperature must be defined to calculate volume."
+        )
 
     def moles_from_volume(self, volume: float) -> float:
         """Calculate moles using the ideal gas law: n = PV/RT."""
         if self.pressure is not None and self.temperature is not None:
             return (self.pressure * volume) / (self.R * self.temperature)  # n = PV/RT
         raise ValueError("Pressure and temperature must be defined to calculate moles.")
-    
+
     def density(self) -> float:
         """Calculate the density of the gas."""
         if self.volume == 0:
@@ -242,25 +295,34 @@ class Gas(Chemical):
 
     def partial_pressure(self, total_pressure: float, mole_fraction: float) -> float:
         """Calculate the partial pressure of the gas in a mixture."""
-        return total_pressure * mole_fraction  # Partial pressure = total pressure * mole fraction
-    
+        return (
+            total_pressure * mole_fraction
+        )  # Partial pressure = total pressure * mole fraction
+
     def grahams_law_effusion(self, molar_mass_other: float) -> float:
         """Calculate the rate of effusion relative to another gas using Graham's Law."""
-        return (self.molar_mass / molar_mass_other) ** 0.5  # Rate of effusion ∝ 1/√(molar mass)
+        return (
+            self.molar_mass / molar_mass_other
+        ) ** 0.5  # Rate of effusion ∝ 1/√(molar mass)
 
-    def compressibility_factor(self, pressure: float, volume: float, temperature: float) -> float:
+    def compressibility_factor(
+        self, pressure: float, volume: float, temperature: float
+    ) -> float:
         """Calculate the compressibility factor Z of the gas."""
         R = 0.0821  # Ideal gas constant in L·atm/(K·mol)
         # Z = PV/nRT, where n = moles
         return (pressure * volume) / (self.moles * R * temperature)  # Z = PV/nRT
-    
+
     def work_done(self, n: float, T: float, V_i: float, V_f: float) -> float:
         """Calculate the work done by the gas during isothermal expansion."""
         R = 0.0821  # Ideal gas constant in L·atm/(K·mol)
         return -n * R * T * (np.log(V_f / V_i))  # Work = -nRT ln(V_f/V_i)
 
     def __repr__(self):
-        return f"{self.name}: {self.pressure} atm, {self.temperature} K, {self.volume} L"
+        return (
+            f"{self.name}: {self.pressure} atm, {self.temperature} K, {self.volume} L"
+        )
+
 
 if __name__ == "__main__":
     # Implement test runs

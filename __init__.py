@@ -7,9 +7,11 @@ except ImportError:
 
 __all__ = ["Chemical", "Acid", "Base", "valid_acids", "valid_bases"]
 
+
 def main():
     acetic_acid = Acid(name="Acetic Acid", volume=0.25, concentration=0.1)
     print(acetic_acid)
+
 
 if __name__ == "__main__":
     main()
