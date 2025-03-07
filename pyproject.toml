@@ -20,9 +20,11 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
+# Point to the package directory rather than the root.
+packages = ["PyChemicals"]
 
 [tool.pytest.ini_options]
+# Ensure that the project root is on the PYTHONPATH so that tests can import PyChemicals.
 pythonpath = [
     "."
 ]

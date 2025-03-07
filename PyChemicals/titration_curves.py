@@ -5,8 +5,8 @@ This module plots titration curves for monoprotic acid-base titrations.
 import matplotlib  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
 import numpy as np
-from chemicals import Acid, Base
-from titration_calculation import volume_of_titrant, Analyte, Titrant
+from .chemicals import Acid, Base
+from .titration_calculation import volume_of_titrant, Analyte, Titrant
 
 matplotlib.use("tkAgg")  # or use 'Qt5Agg'
 

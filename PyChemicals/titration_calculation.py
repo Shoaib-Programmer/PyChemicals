@@ -7,8 +7,8 @@ points in the titration process.
 """
 
 import numpy as np
-from chemicals import Acid, Base, Chemical
-from predefined_chemicals import valid_acids, valid_bases
+from .chemicals import Acid, Base, Chemical
+from .predefined_chemicals import valid_acids, valid_bases
 
 
 class Analyte(Chemical):

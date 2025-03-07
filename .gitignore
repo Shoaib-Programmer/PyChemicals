@@ -2,4 +2,4 @@ __pycache__/*
 **/__pycache/*
 **/*.pyc
 **/*.pyo
-pylint.log
+**/pylint.log
