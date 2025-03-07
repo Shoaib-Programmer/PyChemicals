@@ -1,3 +1,8 @@
+'''
+This module contains predefined acids, bases, and gases for use in titration calculations.
+This will probably be replaced by a database in the future.
+'''
+
 valid_acids = {
     "Hydrochloric Acid": {
         "proticity": 1,
