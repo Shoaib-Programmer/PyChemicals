@@ -22,3 +22,13 @@ def weak_acid():
 def weak_base():
     """Fixture providing a weak base (NH3) for testing."""
     return Base("Ammonia", concentration=0.1, volume=0.025)
+
+@pytest.fixture
+def diprotic_acid():
+    """Fixture providing a diprotic acid (H2SO4) for testing."""
+    return Acid("Sulfuric Acid", concentration=0.1, volume=0.025)
+
+@pytest.fixture
+def diprotic_base():
+    """Fixture providing a diprotic base (Ca(OH)2) for testing."""
+    return Base("Calcium Hydroxide", concentration=0.1, volume=0.025)

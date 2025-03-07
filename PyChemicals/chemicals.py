@@ -79,6 +79,8 @@ class Acid(Chemical):
         super().__init__(name, concentration, volume, mass)
         self.proticity = valid_acids[name]["proticity"]
         self.ka = valid_acids[name]["Ka"]
+        self.ka1 = valid_acids[name]["ka1"] # For diprotic acids
+        self.ka2 = valid_acids[name]["ka2"]
         self.molar_mass = valid_acids[name]["molar_mass"]
         self.validate_acid()
 
@@ -227,6 +229,8 @@ class Base(Chemical):
             raise ValueError(f"Unknown base: {name}")
         self.proticity = valid_bases[name]["proticity"]
         self.kb = valid_bases[name]["Kb"]
+        self.kb1 = valid_bases[name]["kb1"] # For diprotic bases
+        self.kb2 = valid_bases[name]["kb2"]
         super().__init__(name, concentration=concentration, volume=volume, mass=mass)
         self.molar_mass = valid_bases[name]["molar_mass"]
         self.validate_base()
