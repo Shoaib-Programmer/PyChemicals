@@ -1,20 +1,18 @@
-name: Pylint
+name: Pytest
 
-on: 
+on:
   push:
     branches:
       - main
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.10"]
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch full history to enable diff comparisons
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
@@ -35,13 +33,6 @@ jobs:
           pip install -r requirements.txt
           pip install -e .
 
-      - name: Analyse the code with pylint
+      - name: Run tests with pytest
         run: |
-          echo "Finding modified Python files..."
-          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} -- '*.py')
-          if [ -z "$changed_files" ]; then
-            echo "No Python files modified, skipping pylint."
-          else
-            echo "Linting the following files: $changed_files"
-            pylint $changed_files
-          fi
+          pytest --maxfail=1 --disable-warnings -q
