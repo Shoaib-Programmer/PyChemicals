@@ -39,7 +39,7 @@ def test_acid_strength_classification(strong_acid, weak_acid):
 
 def test_acid_ph_calculations():
     """Test pH calculations for different acid concentrations."""
-    acids = [Acid("Hydrochloric Acid", concentration=c) for c in [0.1, 0.01, 0.001]]
+    acids = [Acid("Hydrogen chloride", concentration=c) for c in [0.1, 0.01, 0.001]]
     expected_phs = [1.0, 2.0, 3.0]
     for acid, expected_ph in zip(acids, expected_phs):
         assert abs(acid.ph() - expected_ph) < 0.1
@@ -48,11 +48,11 @@ def test_acid_ph_calculations():
 def test_acid_edge_cases():
     """Test edge cases for acids."""
     # Very dilute acid
-    dilute = Acid("Hydrochloric Acid", concentration=1e-7)
+    dilute = Acid("Hydrogen chloride", concentration=1e-7)
     assert dilute.ph() > 6.9  # Should be close to neutral
 
     # Very concentrated acid
-    conc = Acid("Hydrochloric Acid", concentration=12.0)
+    conc = Acid("Hydrogen chloride", concentration=12.0)
     assert conc.ph() < 0  # Negative pH is possible for concentrated acids
 
 
@@ -74,7 +74,7 @@ def test_base_strength_classification(strong_base, weak_base):
 
 def test_base_ph_calculations():
     """Test pH calculations for different base concentrations."""
-    bases = [Base("Sodium Hydroxide", concentration=c) for c in [0.1, 0.01, 0.001]]
+    bases = [Base("Sodium hydroxide", concentration=c) for c in [0.1, 0.01, 0.001]]
     expected_phs = [13.0, 12.0, 11.0]
     for base, expected_ph in zip(bases, expected_phs):
         assert abs(base.ph() - expected_ph) < 0.1
@@ -83,11 +83,11 @@ def test_base_ph_calculations():
 def test_base_edge_cases():
     """Test edge cases for bases."""
     # Very dilute base
-    dilute = Base("Sodium Hydroxide", concentration=1e-7)
+    dilute = Base("Sodium hydroxide", concentration=1e-7)
     assert dilute.ph() < 7.1  # Should be close to neutral
 
     # Very concentrated base
-    conc = Base("Sodium Hydroxide", concentration=10.0)
+    conc = Base("Sodium hydroxide", concentration=10.0)
     assert conc.ph() > 14  # Can exceed pH 14 for concentrated bases
 
 
@@ -103,7 +103,7 @@ def test_diprotic_base_properties(diprotic_base):
 # Temperature dependence tests
 def test_temperature_effects():
     """Test temperature dependence of equilibrium constants."""
-    acid = Acid("Acetic Acid", concentration=0.1)
+    acid = Acid("Ethanoic acid", concentration=0.1)
     ka_25c = acid.ka
     ka_50c = Acid.calculate_temp_dependence(ka_25c, 25, 50, 50000)  # Example ΔH
     assert ka_50c > ka_25c  # Endothermic reaction
@@ -112,7 +112,7 @@ def test_temperature_effects():
 # Mass and concentration tests
 def test_mass_concentration_relationships():
     """Test relationships between mass, concentration, and volume."""
-    acid = Acid("Hydrochloric Acid", concentration=0.1, volume=1.0)
+    acid = Acid("Hydrogen chloride", concentration=0.1, volume=1.0)
     calc_mass = acid.calculate_mass()
     expected_mass = 0.1 * 1.0 * acid.molar_mass
     assert abs(calc_mass - expected_mass) < 0.001
@@ -126,5 +126,5 @@ def test_invalid_chemical_combinations():
         Base("Invalid Base")
     with pytest.raises(ValueError):
         Acid(
-            "Hydrochloric Acid", concentration=0.1, volume=1.0, mass=100
+            "Hydrogen chloride", concentration=0.1, volume=1.0, mass=100
         )  # Inconsistent mass

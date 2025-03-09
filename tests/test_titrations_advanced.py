@@ -14,8 +14,8 @@ from PyChemicals.chemicals import Acid
 
 def test_titration_stoichiometry():
     """Test stoichiometric calculations in titrations."""
-    analyte = Analyte("Hydrochloric Acid", volume=0.025, concentration=0.1)
-    titrant = Titrant("Sodium Hydroxide", concentration=0.1)
+    analyte = Analyte("Hydrogen chloride", volume=0.025, concentration=0.1)
+    titrant = Titrant("Sodium hydroxide", concentration=0.1)
 
     # Test 1:1 stoichiometry
     v_eq = volume_of_titrant(analyte, titrant)
@@ -28,8 +28,8 @@ def test_titration_stoichiometry():
 
 def test_titration_curves():
     """Test various points on titration curves."""
-    acid = Analyte("Hydrochloric Acid", volume=0.025, concentration=0.1)
-    base = Titrant("Sodium Hydroxide", concentration=0.1)
+    acid = Analyte("Hydrogen chloride", volume=0.025, concentration=0.1)
+    base = Titrant("Sodium hydroxide", concentration=0.1)
 
     # Before equivalence (half-way)
     v_eq = volume_of_titrant(acid, base)
@@ -49,8 +49,8 @@ def test_titration_curves():
 
 def test_concentration_determination():
     """Test determination of unknown concentrations."""
-    unknown = Analyte("Hydrochloric Acid", volume=0.025)
-    titrant = Titrant("Sodium Hydroxide", concentration=0.1, volume=0.025)
+    unknown = Analyte("Hydrogen chloride", volume=0.025)
+    titrant = Titrant("Sodium hydroxide", concentration=0.1, volume=0.025)
 
     conc = calculate_analyte_concentration(unknown, titrant, 1.0)
     assert abs(conc - 0.1) < 0.001
@@ -58,8 +58,8 @@ def test_concentration_determination():
 
 def test_invalid_titrations():
     """Test invalid titration scenarios."""
-    acid1 = Analyte("Hydrochloric Acid")
-    acid2 = Titrant("Sulfuric Acid")
+    acid1 = Analyte("Hydrogen chloride")
+    acid2 = Titrant("Sulfuric acid")
 
     with pytest.raises(ValueError):
         # Cannot titrate acid with acid
@@ -68,8 +68,8 @@ def test_invalid_titrations():
 
 def test_diprotic_titrations():
     """Test titrations involving diprotic acids."""
-    acid = Analyte("Sulfuric Acid", concentration=0.1, volume=0.025)
-    base = Titrant("Sodium Hydroxide", concentration=0.1)
+    acid = Analyte("Sulfuric acid", concentration=0.1, volume=0.025)
+    base = Titrant("Sodium hydroxide", concentration=0.1)
 
     # First equivalence point (1:1 ratio)
     v_eq1 = volume_of_titrant(acid, base)
@@ -84,8 +84,8 @@ def test_diprotic_titrations():
 
 def test_buffer_regions():
     """Test pH calculations in buffer regions."""
-    weak_acid = Analyte("Acetic Acid", volume=0.025, concentration=0.1)
-    strong_base = Titrant("Sodium Hydroxide", concentration=0.1)
+    weak_acid = Analyte("Ethanoic acid", volume=0.025, concentration=0.1)
+    strong_base = Titrant("Sodium hydroxide", concentration=0.1)
 
     # At half equivalence (buffer region)
     v_eq = volume_of_titrant(weak_acid, strong_base)

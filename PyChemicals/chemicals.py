@@ -3,7 +3,74 @@ This module contains all the classes for the chemicals in the PyChemicals packag
 """
 
 import numpy as np
-from .predefined_chemicals import valid_acids, valid_bases, valid_gases
+from cs50 import SQL  # type: ignore
+
+# Connect to the chemicals database (this file should be in your current working directory)
+db = SQL("sqlite:///chemicals.db")
+
+
+def get_acids():
+    """Retrieve acids data from the database and return a dictionary."""
+    rows = db.execute("SELECT * FROM acids")
+    acids = {}
+    for row in rows:
+        acid_id = row["id"]
+        chem_name = row["name"]
+        temp_rows = db.execute(
+            "SELECT temperature, ka FROM acid_temperatures WHERE acid_id = ?", acid_id
+        )
+        ka_temp = {t["temperature"]: t["ka"] for t in temp_rows}
+        acids[chem_name] = {
+            "proticity": row["proticity"],
+            "Ka": row["Ka"],
+            "molar_mass": row["molar_mass"],
+            "ka1": row["ka1"],
+            "ka2": row["ka2"],
+            "Ka_temp": ka_temp,
+        }
+    return acids
+
+
+def get_bases():
+    """Retrieve bases data from the database and return a dictionary."""
+    rows = db.execute("SELECT * FROM bases")
+    bases = {}
+    for row in rows:
+        base_id = row["id"]
+        chem_name = row["name"]
+        temp_rows = db.execute(
+            "SELECT temperature, kb FROM base_temperatures WHERE base_id = ?", base_id
+        )
+        kb_temp = {t["temperature"]: t["kb"] for t in temp_rows}
+        bases[chem_name] = {
+            "proticity": row["proticity"],
+            "Kb": row["Kb"],
+            "molar_mass": row["molar_mass"],
+            "kb1": row["kb1"],
+            "kb2": row["kb2"],
+            "Kb_temp": kb_temp,
+        }
+    return bases
+
+
+def get_gases():
+    """Retrieve gases data from the database and return a dictionary."""
+    rows = db.execute("SELECT * FROM gases")
+    gases = {}
+    for row in rows:
+        chem_name = row["name"]
+        gases[chem_name] = {
+            "molar_mass": row["molar_mass"],
+            "density": row[
+                "density"
+            ],  # Note: This is a reference density (typically at standard conditions)
+        }
+    return gases
+
+
+valid_acids = get_acids()
+valid_bases = get_bases()
+valid_gases = get_gases()
 
 
 class Chemical:
@@ -79,7 +146,7 @@ class Acid(Chemical):
         super().__init__(name, concentration, volume, mass)
         self.proticity = valid_acids[name]["proticity"]
         self.ka = valid_acids[name]["Ka"]
-        self.ka1 = valid_acids[name]["ka1"] # For diprotic acids
+        self.ka1 = valid_acids[name]["ka1"]  # For diprotic acids
         self.ka2 = valid_acids[name]["ka2"]
         self.molar_mass = valid_acids[name]["molar_mass"]
         self.validate_acid()
@@ -229,7 +296,7 @@ class Base(Chemical):
             raise ValueError(f"Unknown base: {name}")
         self.proticity = valid_bases[name]["proticity"]
         self.kb = valid_bases[name]["Kb"]
-        self.kb1 = valid_bases[name]["kb1"] # For diprotic bases
+        self.kb1 = valid_bases[name]["kb1"]  # For diprotic bases
         self.kb2 = valid_bases[name]["kb2"]
         super().__init__(name, concentration=concentration, volume=volume, mass=mass)
         self.molar_mass = valid_bases[name]["molar_mass"]
@@ -529,3 +596,15 @@ if __name__ == "__main__":
     # Implement test runs
     hcl = Acid(name="Hydrochloric Acid", concentration=0.3)
     print(hcl.ph())
+
+    print("Acids:")
+    for acid_name, data in valid_acids.items():  # Changed name to acid_name
+        print(f"  {acid_name}: {data}")
+
+    print("\nBases:")
+    for base_name, data in valid_bases.items():  # Changed name to base_name
+        print(f"  {base_name}: {data}")
+
+    print("\nGases:")
+    for gas_name, data in valid_gases.items():  # Changed name to gas_name
+        print(f"  {gas_name}: {data}")

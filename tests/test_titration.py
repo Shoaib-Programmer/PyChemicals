@@ -10,22 +10,22 @@ from PyChemicals.titration_calculation import (
 
 def test_volume_of_titrant():
     """Test calculation of required titrant volume."""
-    hcl = Acid("Hydrochloric Acid", concentration=0.1, volume=0.025)
-    naoh = Base("Sodium Hydroxide", concentration=0.1)
+    hcl = Acid("Hydrogen chloride", concentration=0.1, volume=0.025)
+    naoh = Base("Sodium hydroxide", concentration=0.1)
     volume = volume_of_titrant(hcl, naoh)
     assert abs(volume - 0.025) < 0.001  # Should need equal volumes for equal concentrations
 
 def test_ph_at_equivalence():
     """Test pH calculation at equivalence point."""
-    hcl = Acid("Hydrochloric Acid", concentration=0.1, volume=0.025)
-    naoh = Base("Sodium Hydroxide", concentration=0.1)
+    hcl = Acid("Hydrogen chloride", concentration=0.1, volume=0.025)
+    naoh = Base("Sodium hydroxide", concentration=0.1)
     ph = ph_at_equivalence(hcl, naoh)
     assert abs(ph - 7.0) < 0.1  # Should be neutral at equivalence
 
 def test_ph_after_equivalence():
     """Test pH calculation after equivalence point."""
-    hcl = Acid("Hydrochloric Acid", concentration=0.1, volume=0.025)
-    naoh = Base("Sodium Hydroxide", concentration=0.1)
+    hcl = Acid("Hydrogen chloride", concentration=0.1, volume=0.025)
+    naoh = Base("Sodium hydroxide", concentration=0.1)
 
     # Test after equivalence - use 120% of equivalence volume
     v_eq = volume_of_titrant(hcl, naoh)
@@ -35,7 +35,7 @@ def test_ph_after_equivalence():
 
 def test_analyte_concentration():
     """Test calculation of analyte concentration."""
-    unknown_acid = Acid("Hydrochloric Acid", volume=0.025)
-    naoh = Base("Sodium Hydroxide", concentration=0.1, volume=0.025)
+    unknown_acid = Acid("Hydrogen chloride", volume=0.025)
+    naoh = Base("Sodium hydroxide", concentration=0.1, volume=0.025)
     conc = calculate_analyte_concentration(unknown_acid, naoh, 1.0)
     assert abs(conc - 0.1) < 0.001  # Should be 0.1M

@@ -6,17 +6,17 @@ from PyChemicals.chemicals import Acid, Base
 @pytest.fixture
 def strong_acid():
     """Fixture providing a strong acid (HCl) for testing."""
-    return Acid("Hydrochloric Acid", concentration=0.1, volume=0.025)
+    return Acid("Hydrogen chloride", concentration=0.1, volume=0.025)
 
 @pytest.fixture
 def strong_base():
     """Fixture providing a strong base (NaOH) for testing."""
-    return Base("Sodium Hydroxide", concentration=0.1, volume=0.025)
+    return Base("Sodium hydroxide", concentration=0.1, volume=0.025)
 
 @pytest.fixture
 def weak_acid():
     """Fixture providing a weak acid (CH3COOH) for testing."""
-    return Acid("Acetic Acid", concentration=0.1, volume=0.025)
+    return Acid("Ethanoic acid", concentration=0.1, volume=0.025)
 
 @pytest.fixture
 def weak_base():
@@ -26,9 +26,9 @@ def weak_base():
 @pytest.fixture
 def diprotic_acid():
     """Fixture providing a diprotic acid (H2SO4) for testing."""
-    return Acid("Sulfuric Acid", concentration=0.1, volume=0.025)
+    return Acid("Sulfuric acid", concentration=0.1, volume=0.025)
 
 @pytest.fixture
 def diprotic_base():
     """Fixture providing a diprotic base (Ca(OH)2) for testing."""
-    return Base("Calcium Hydroxide", concentration=0.1, volume=0.025)
+    return Base("Calcium hydroxide", concentration=0.1, volume=0.025)
