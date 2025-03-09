@@ -13,8 +13,6 @@ jobs:
         python-version: ["3.10"]
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Fetch full history to enable diff comparisons
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
@@ -35,14 +33,7 @@ jobs:
           pip install -r requirements.txt
           pip install -e .
 
-      - name: pylint
+      - name: Lint all Python files with pylint
         run: |
-          echo "Finding modified Python files..."
-          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} -- '*.py')
-          if [ -z "$changed_files" ]; then
-            echo "No Python files modified, skipping pylint."
-          else
-            file_count=$(echo "$changed_files" | wc -w)
-            echo "Found $file_count Python file(s) to analyze: $changed_files"
-            pylint $changed_files
-          fi
+          echo "Finding and linting all Python files..."
+          find . -name '*.py' | xargs pylint

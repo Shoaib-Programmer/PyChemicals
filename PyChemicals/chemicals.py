@@ -258,11 +258,11 @@ class Acid(Chemical):
         Returns:
             float: pH value.
         """
-        pH_value = -np.log10(self.h_plus())
+        ph_value = -np.log10(self.h_plus())
         # If pH is extremely close to 0, set it to 0.0 explicitly.
-        if np.isclose(pH_value, 0.0):
+        if np.isclose(ph_value, 0.0):
             return 0.0
-        return pH_value
+        return ph_value
 
     def moles(self):
         """
