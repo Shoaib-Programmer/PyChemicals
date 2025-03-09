@@ -29,6 +29,6 @@ And you're all set! You can import PyChemicals into a python file anywhere on yo
 ```python
 from PyChemicals import Acid
 
-hcl = Acid('Hydrochloric Acid', concentration=0.3)
+hcl = Acid('Hydrogen chloride', concentration=0.3)
 print(hcl.ph())
 ```
