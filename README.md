@@ -18,8 +18,6 @@ git clone https://github.com/Shoaib-Programmer/PyChemicals.git
 pip install -r requirements.txt
 ```
 
-I am considering implementing Poetry for this project to avoid this extra step for setup, and make it production-ready.
-
 Then install it in development mode:
 ```bash
 pip install -e .
