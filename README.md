@@ -23,6 +23,8 @@ Then install it in development mode:
 pip install -e .
 ```
 
+This uses Hatchling as a build backend. In production, you wouldn't have to install the dependencies manually.
+
 And you're all set! You can import PyChemicals into a python file anywhere on your computer. Here is an example of how you can go about using it:
 ```python
 from PyChemicals import Acid
