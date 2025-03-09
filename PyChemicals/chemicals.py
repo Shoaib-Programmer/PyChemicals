@@ -4,16 +4,10 @@ This module contains all the classes for the chemicals in the PyChemicals packag
 
 import numpy as np
 from cs50 import SQL  # type: ignore
-import os
 
-# Get the absolute path to the current file's directory
-module_dir = os.path.dirname(os.path.abspath(__file__))
-# Assume the chemicals.db file is located in the project root (one level above the package)
-project_root = os.path.join(module_dir, '..')
-db_path = os.path.join(project_root, 'chemicals.db')
+# Connect to the chemicals database (this file should be in your current working directory)
+db = SQL("sqlite:///chemicals.db")
 
-# Use the absolute path in the connection string
-db = SQL(f"sqlite:///{db_path}")
 
 def get_acids():
     """Retrieve acids data from the database and return a dictionary."""
@@ -257,7 +251,11 @@ class Acid(Chemical):
         Returns:
             float: pH value.
         """
-        return -np.log10(self.h_plus())
+        pH_value = -np.log10(self.h_plus())
+        # If pH is extremely close to 0, set it to 0.0 explicitly.
+        if np.isclose(pH_value, 0.0):
+            return 0.0
+        return pH_value
 
     def moles(self):
         """
