@@ -32,5 +32,3 @@ from PyChemicals import Acid
 hcl = Acid('Hydrochloric Acid', concentration=0.3)
 print(hcl.ph())
 ```
-
-I'm considering implementing an SQLite database to store predefined chemicals, and use IUPAC names instead of common names.
