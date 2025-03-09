@@ -25,11 +25,11 @@ Then install it in development mode:
 pip install -e .
 ```
 
-And you're all set! You can import PyChemicals into python file anywhere on your computer. Here is an example of how you can go about using it:
+And you're all set! You can import PyChemicals into a python file anywhere on your computer. Here is an example of how you can go about using it:
 ```python
 from PyChemicals import Acid
 
-hcl = Acid('Hydrochloric Acid')
+hcl = Acid('Hydrochloric Acid', concentration=0.3)
 print(hcl.ph())
 ```
 
