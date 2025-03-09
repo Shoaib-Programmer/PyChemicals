@@ -3,3 +3,4 @@ pytest>=6.0
 matplotlib
 hatchling
 pylint
+cs50

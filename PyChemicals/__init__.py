@@ -3,13 +3,11 @@
 # pylint: disable=missing-function-docstring
 
 try:
-    from .predefined_chemicals import valid_acids, valid_bases
-    from .chemicals import Chemical, Acid, Base
+    from .chemicals import Chemical, Acid, Base, valid_acids, valid_bases, valid_gases
 except ImportError:
-    from predefined_chemicals import valid_acids, valid_bases
-    from chemicals import Chemical, Acid, Base
+    from chemicals import Chemical, Acid, Base, valid_acids, valid_bases, valid_gases
 
-__all__ = ["Chemical", "Acid", "Base", "valid_acids", "valid_bases"]
+__all__ = ["Chemical", "Acid", "Base", "valid_acids", "valid_bases", "valid_gases"]
 
 
 def main():
