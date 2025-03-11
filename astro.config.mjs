@@ -6,7 +6,7 @@ export default defineConfig({
   image: {
     service: { entrypoint: "astro/assets/services/noop" },
   },
-  site: "https://Shoaib-Programmer.github.io",
+  site: "https://Shoaib-Programmer.github.io/PyChemicals",
   base: "/PyChemicals/",
   integrations: [
     starlight({
