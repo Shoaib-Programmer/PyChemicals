@@ -11,6 +11,11 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "PyChemicals",
+      logo: {
+        src: "./src/assets/logo.svg",
+        replacesTitle: true,
+      },
+      favicon: "./src/assets/logo.svg",
       social: {
         github: "https://github.com/Shoaib-Programmer/PyChemicals",
       },
