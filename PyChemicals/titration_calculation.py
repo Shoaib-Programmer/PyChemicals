@@ -11,41 +11,40 @@ from .chemicals import Acid, Base, Chemical
 from .predefined_chemicals import valid_acids, valid_bases
 
 
+def _validate_positive(value, name: str):
+    if value is None:
+        raise ValueError(f"{name} must be provided.")
+    if value <= 0:
+        raise ValueError(f"{name} must be a positive number.")
+
+
 class Analyte(Chemical):
     """Class representing an analyte in a titration process."""
+
+    def __new__(
+        cls, name: str, volume: float = None, concentration: float = None, titrant=None
+    ):
+        # Choose the appropriate subclass based on the name.
+        if name in valid_acids:
+            return Acid(name, concentration=concentration, volume=volume)
+        elif name in valid_bases:
+            return Base(name, concentration=concentration, volume=volume)
+        return super().__new__(cls)
 
     def __init__(
         self, name: str, volume: float = None, concentration: float = None, titrant=None
     ):
-        """
-        Initialize an Analyte instance.
-
-        Args:
-            name (str): Name of the analyte.
-            volume (float, optional): Volume of the analyte.
-            concentration (float, optional): Concentration of the analyte.
-            titrant (optional): Titrant used in the titration.
-        """
+        _validate_positive(volume, "Volume")
+        _validate_positive(concentration, "Concentration")
+        # Call Chemical's initializer
         super().__init__(name=name, concentration=concentration, volume=volume)
-        if name in valid_acids:
-            self.__class__ = Acid
-            self.__init__(name=name, concentration=concentration, volume=volume)
-        elif name in valid_bases:
-            self.__class__ = Base
-            self.__init__(name=name, concentration=concentration, volume=volume)
-
         if titrant is not None:
             self.validate_titrant(titrant)
 
-    def validate_titrant(self, titrant):
+    def validate_titrant(self, titrant: Chemical):
         """
         Validate that the titrant is chemically compatible with the analyte.
-
-        Args:
-            titrant: The titrant to be validated.
-
-        Raises:
-            ValueError: If both analyte and titrant are acids or both are bases.
+        Raises a ValueError if both the analyte and titrant are of the same type.
         """
         if isinstance(titrant, Acid) and isinstance(self, Acid):
             raise ValueError("Both Analyte and Titrant cannot be acids.")
@@ -56,42 +55,29 @@ class Analyte(Chemical):
 class Titrant(Chemical):
     """Class representing a titrant in a titration process."""
 
+    def __new__(
+        cls, name: str, concentration: float = None, volume: float = None, analyte=None
+    ):
+        # Choose the appropriate subclass based on the name.
+        if name in valid_acids:
+            return Acid(name, concentration=concentration, volume=volume)
+        elif name in valid_bases:
+            return Base(name, concentration=concentration, volume=volume)
+        return super().__new__(cls)
+
     def __init__(
         self, name: str, concentration: float = None, volume: float = None, analyte=None
     ):
-        """
-        Initialize a Titrant instance.
-
-        Depending on the name provided, the instance's class type may change to Acid
-        or Base.
-
-        Args:
-            name (str): Name of the titrant.
-            concentration (float, optional): Concentration of the titrant.
-            volume (float, optional): Volume of the titrant.
-            analyte (optional): Analyte for cross-validation.
-        """
-        if name in valid_acids:
-            super().__init__(name=name, concentration=concentration, volume=volume)
-            self.__class__ = Acid  # Change the class type to Acid
-        elif name in valid_bases:
-            super().__init__(name=name, concentration=concentration, volume=volume)
-            self.__class__ = Base  # Change the class type to Base
-        else:
-            super().__init__(name=name, concentration=concentration, volume=volume)
-
+        _validate_positive(volume, "Volume")
+        _validate_positive(concentration, "Concentration")
+        super().__init__(name=name, concentration=concentration, volume=volume)
         if analyte is not None:
             self.validate_analyte(analyte)
 
-    def validate_analyte(self, analyte):
+    def validate_analyte(self, analyte: Chemical):
         """
         Validate that the analyte is chemically compatible with the titrant.
-
-        Args:
-            analyte: The analyte to be validated.
-
-        Raises:
-            ValueError: If both analyte and titrant are acids or both are bases.
+        Raises a ValueError if both the analyte and titrant are of the same type.
         """
         if isinstance(analyte, Acid) and isinstance(self, Acid):
             raise ValueError("Both Analyte and Titrant cannot be acids.")
@@ -99,125 +85,107 @@ class Titrant(Chemical):
             raise ValueError("Both Analyte and Titrant cannot be bases.")
 
 
-def strength(analyte: Analyte):
+def strength(analyte: Chemical) -> str:
     """
     Determine the strength of the analyte.
-
-    Args:
-        analyte (Analyte): The analyte whose strength is to be determined.
-
-    Returns:
-        str or None: "strong acid", "weak acid", "strong base", "weak base", or
-        None if the analyte is neither an acid nor a base.
+    Returns a string such as "strong acid", "weak acid", "strong base", "weak base",
+    or None if the analyte is neither an acid nor a base.
     """
     if isinstance(analyte, Acid):
-        if analyte.ka > 1:
+        if hasattr(analyte, "ka") and analyte.ka > 1:
             return "strong acid"
         return "weak acid"
     if isinstance(analyte, Base):
-        if analyte.kb > 1:
+        if hasattr(analyte, "kb") and analyte.kb > 1:
             return "strong base"
         return "weak base"
     return None
 
 
 def volume_of_titrant(
-    analyte: Analyte, titrant: Titrant, stoichiometric_ratio: float = 1.0
+    analyte: Chemical, titrant: Chemical, stoichiometric_ratio: float = 1.0
 ) -> float:
     """
     Calculate the volume of titrant needed to reach equivalence.
 
     Args:
-        analyte (Analyte): The analyte being titrated.
-        titrant (Titrant): The titrant used in the titration.
-        stoichiometric_ratio (float): The stoichiometric ratio of the analyte to titrant.
+        analyte: The analyte being titrated.
+        titrant: The titrant used in the titration.
+        stoichiometric_ratio: The stoichiometric ratio of the analyte to titrant.
 
     Returns:
-        float: Volume of titrant needed in liters.
+        The volume of titrant needed in liters.
 
     Raises:
-        ValueError: If the analyte's or titrant's concentration/volume is not provided.
+        ValueError: If required concentrations, volumes, or stoichiometric ratio are missing or invalid.
     """
-    if analyte.concentration is None or analyte.volume is None:
-        raise ValueError("Analyte concentration and volume must be provided.")
-    if titrant.concentration is None:
-        raise ValueError("Titrant concentration must be provided.")
+    _validate_positive(analyte.volume, "Analyte volume")
+    _validate_positive(analyte.concentration, "Analyte concentration")
+    _validate_positive(titrant.concentration, "Titrant concentration")
+    if stoichiometric_ratio <= 0:
+        raise ValueError("Stoichiometric ratio must be greater than zero.")
 
     moles_analyte = analyte.concentration * analyte.volume
     moles_titrant_needed = moles_analyte / stoichiometric_ratio
 
-    # For diprotic acids/bases, adjust the volume based on the dissociation step
-    if isinstance(analyte, (Acid, Base)) and analyte.proticity == 2:
-        if stoichiometric_ratio == 2.0:
-            moles_titrant_needed *= (
-                2  # Double the moles needed for complete neutralization
-            )
+    # If the analyte is diprotic/dibasic, adjust based on proticity (if defined)
+    proticity = getattr(analyte, "proticity", 1)
+    if proticity == 2 and stoichiometric_ratio == 2.0:
+        moles_titrant_needed *= 2
 
     volume_titrant_needed = moles_titrant_needed / titrant.concentration
     return volume_titrant_needed
 
 
 def calculate_analyte_concentration(
-    analyte: Analyte, titrant: Titrant, stoichiometric_ratio: float
-):
+    analyte: Chemical, titrant: Chemical, stoichiometric_ratio: float
+) -> float:
     """
-    Calculate the concentration of the analyte using the titrant's data.
+    Calculate the concentration of the analyte from titration data.
 
     Args:
-        analyte (Analyte): The analyte object.
-        titrant (Titrant): The titrant object.
-        stoichiometric_ratio (float): Stoichiometric ratio between the analyte and titrant.
+        analyte: The analyte object.
+        titrant: The titrant object.
+        stoichiometric_ratio: Stoichiometric ratio between the analyte and titrant.
 
     Returns:
-        float: The calculated concentration of the analyte (in mol/L).
+        The calculated concentration of the analyte (in mol/L).
 
     Raises:
-        ValueError: If required volumes or concentrations are missing or invalid.
+        ValueError: If volumes, concentrations, or stoichiometric ratio are invalid.
     """
-    if analyte.volume is None:
-        raise ValueError("Volume of analyte must be provided.")
-    if titrant.volume is None:
-        raise ValueError("Volume of titrant must be provided.")
-    if titrant.concentration is None:
-        raise ValueError("Concentration of titrant must be provided.")
+    _validate_positive(analyte.volume, "Analyte volume")
+    _validate_positive(titrant.volume, "Titrant volume")
+    _validate_positive(titrant.concentration, "Titrant concentration")
     if stoichiometric_ratio <= 0:
         raise ValueError("Stoichiometric ratio must be greater than zero.")
 
     moles_titrant = titrant.concentration * titrant.volume
     moles_analyte = moles_titrant * stoichiometric_ratio
     concentration_analyte = moles_analyte / analyte.volume
-
     return concentration_analyte
 
 
-def ph_at_equivalence(analyte: Analyte, titrant: Titrant):
+def ph_at_equivalence(analyte: Chemical, titrant: Chemical) -> float:
     """
     Calculate the pH at the equivalence point of the titration.
 
-    This is a placeholder for actual pH calculation logic based on the types of
-    analyte and titrant.
-
-    Args:
-        analyte (Analyte): The analyte being titrated.
-        titrant (Titrant): The titrant used in the titration.
+    Note: This is a simplified placeholder. For weak acid/strong base (or vice versa)
+    titrations, the equivalence pH will differ from 7.
 
     Returns:
-        float or None: pH at equivalence or None if not applicable.
+        pH at equivalence or None if not applicable.
     """
     if isinstance(analyte, Acid) and isinstance(titrant, Base):
-        return 7.0  # Neutralization point for strong acid + strong base
+        return 7.0  # For a strong acid + strong base titration.
     if isinstance(analyte, Base) and isinstance(titrant, Acid):
-        return 7.0  # Neutralization point for strong base + strong acid
+        return 7.0
     return None
 
 
-def calculate_half_equivalence(analyte, titrant):
+def calculate_half_equivalence(analyte: Chemical, titrant: Chemical):
     """
     Calculate the pH at the half-equivalence point.
-
-    Args:
-        analyte: The analyte object.
-        titrant: The titrant object.
 
     Raises:
         NotImplementedError: This function is not implemented yet.
@@ -227,52 +195,81 @@ def calculate_half_equivalence(analyte, titrant):
 
 def ph_after_equivalence(acid: Acid, base: Base, excess_volume: float) -> float:
     """
-    Calculate pH at any point during titration.
+    Calculate the pH after (or before) the equivalence point in a titration.
 
     Args:
-        acid (Acid): The acid in the titration.
-        base (Base): The base titrant.
-        excess_volume (float): Volume of base added (in L).
+        acid: The acid being titrated.
+        base: The base titrant.
+        excess_volume: The volume of base added (in liters).
 
     Returns:
-        float: The calculated pH.
+        The calculated pH.
+
+    Raises:
+        ValueError: If excess_volume is negative or if any intermediate calculation yields invalid values.
     """
+    _validate_positive(acid.volume, "Acid volume")
+    _validate_positive(acid.concentration, "Acid concentration")
+    _validate_positive(base.concentration, "Base concentration")
+    if excess_volume < 0:
+        raise ValueError("Excess volume cannot be negative.")
+
+    total_volume = acid.volume + excess_volume
     moles_acid = acid.concentration * acid.volume
 
-    # For weak acids, use Ka to calculate the pH
-    if acid.ka < 1:  # Weak acid
-        if excess_volume == acid.volume / 2:  # At half-equivalence
-            return acid.pka()
-
-        # Calculate concentration of remaining acid and conjugate base
-        total_volume = acid.volume + excess_volume
+    # For weak acids, use Henderson-Hasselbalch approach near half-equivalence
+    if hasattr(acid, "ka") and acid.ka < 1:
+        # At half-equivalence, [HA] = [A-] so pH = pKa
+        if excess_volume == acid.volume / 2:
+            if hasattr(acid, "pka"):
+                return acid.pka()
+            else:
+                return -np.log10(acid.ka)
         moles_base_added = base.concentration * excess_volume
-        remaining_acid = (moles_acid - moles_base_added) / total_volume
-        conjugate_base = moles_base_added / total_volume
-        if remaining_acid > 0:
-            return -np.log10((acid.ka * remaining_acid) / conjugate_base)
+        remaining_acid = moles_acid - moles_base_added
+        if remaining_acid <= 0:
+            # After equivalence, use excess OH
+            excess_oh = (moles_base_added - moles_acid) / total_volume
+            if excess_oh <= 0:
+                raise ValueError("Invalid OH concentration computed.")
+            return 14 + np.log10(excess_oh)
+        conjugate_base = moles_base_added
+        # Calculate concentrations
+        conc_acid = remaining_acid / total_volume
+        conc_base = conjugate_base / total_volume
+        if conc_acid <= 0 or conc_base <= 0:
+            raise ValueError(
+                "Invalid concentrations for Henderson-Hasselbalch calculation."
+            )
+        # Henderson-Hasselbalch: pH = pKa + log10([A-]/[HA])
+        return -np.log10(acid.ka) + np.log10(conc_base / conc_acid)
 
-    # For strong acids and bases, use excess concentration
+    # For strong acids and bases:
     moles_base = base.concentration * excess_volume
-    total_volume = acid.volume + excess_volume
-
-    if moles_base > moles_acid:  # After equivalence
+    if moles_base > moles_acid:
         excess_oh = (moles_base - moles_acid) / total_volume
+        if excess_oh <= 0:
+            raise ValueError("Calculated excess OH concentration is non-positive.")
         return 14 + np.log10(excess_oh)
-
-    # Before equivalence
-    excess_h = (moles_acid - moles_base) / total_volume
-    return -np.log10(excess_h)
+    elif moles_acid > moles_base:
+        excess_h = (moles_acid - moles_base) / total_volume
+        if excess_h <= 0:
+            raise ValueError("Calculated excess H+ concentration is non-positive.")
+        return -np.log10(excess_h)
+    else:
+        # At equivalence
+        return ph_at_equivalence(acid, base)
 
 
 # Example usage of the functions
 if __name__ == "__main__":
-    hcl = Acid("Hydrochloric Acid", concentration=0.1, volume=0.025)  # 0.1 M HCl, 25 mL
-    naoh = Base(
-        "Sodium Hydroxide", concentration=0.1, volume=0.025
-    )  # 0.1 M NaOH, 25 mL
+    # Create instances using the factory behavior in Analyte and Titrant.
+    # Note: If "Hydrochloric Acid" and "Sodium Hydroxide" are in valid_acids and valid_bases,
+    # they will be returned as Acid and Base instances respectively.
+    hcl = Analyte("Hydrochloric Acid", concentration=0.1, volume=0.025)
+    naoh = Titrant("Sodium Hydroxide", concentration=0.1, volume=0.025)
 
     print("pH at Equivalence:", ph_at_equivalence(hcl, naoh))
     print("Volume of Titrant Needed:", volume_of_titrant(hcl, naoh))
-    # Example call for ph_after_equivalence with an excess volume of 0.01 L
+    # Example call for ph_after_equivalence with an excess volume of 0.01 L.
     print("pH after Equivalence:", ph_after_equivalence(hcl, naoh, 0.01))

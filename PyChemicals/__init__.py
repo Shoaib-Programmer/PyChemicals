@@ -5,9 +5,22 @@
 try:
     from .chemicals import Chemical, Acid, Base, valid_acids, valid_bases, valid_gases
 except ImportError:
+    print("ImportError: Unable to import chemicals module.")
     from chemicals import Chemical, Acid, Base, valid_acids, valid_bases, valid_gases
 
-__all__ = ["Chemical", "Acid", "Base", "valid_acids", "valid_bases", "valid_gases"]
+from . import titration_calculation
+from . import titration_curves
+
+__all__ = [
+    "Chemical",
+    "Acid",
+    "Base",
+    "valid_acids",
+    "valid_bases",
+    "valid_gases",
+    "titration_calculation",
+    "titration_curves",
+]
 
 
 def main():
