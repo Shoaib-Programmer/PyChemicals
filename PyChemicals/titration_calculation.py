@@ -117,7 +117,8 @@ def volume_of_titrant(
         The volume of titrant needed in liters.
 
     Raises:
-        ValueError: If required concentrations, volumes, or stoichiometric ratio are missing or invalid.
+        ValueError: If required concentrations, volumes, or 
+        stoichiometric ratio are missing or invalid.
     """
     _validate_positive(analyte.volume, "Analyte volume")
     _validate_positive(analyte.concentration, "Analyte concentration")
@@ -206,7 +207,8 @@ def ph_after_equivalence(acid: Acid, base: Base, excess_volume: float) -> float:
         The calculated pH.
 
     Raises:
-        ValueError: If excess_volume is negative or if any intermediate calculation yields invalid values.
+        ValueError: If excess_volume is negative or if any intermediate 
+        calculation yields invalid values.
     """
     _validate_positive(acid.volume, "Acid volume")
     _validate_positive(acid.concentration, "Acid concentration")
