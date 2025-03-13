@@ -33,4 +33,8 @@ export default defineConfig({
       // Removed multi-language options: defaultLocale and locales 
     }), 
   ], 
+    markdown: {
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [rehypeMathjax],
+  },
 }); 
