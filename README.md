@@ -32,3 +32,7 @@ from PyChemicals import Acid
 hcl = Acid('Hydrogen chloride', concentration=0.3)
 print(hcl.ph())
 ```
+
+THis package uses a database, and loads chemical data when it is needed. I'm planning on implementing a feature to optionally cache it for performance-heavy operations.
+
+This project is under heavy construction.
