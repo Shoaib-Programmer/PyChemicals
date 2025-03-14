@@ -136,14 +136,3 @@ def titrate_curve_monoprotic(analyte: Analyte, titrant: Titrant) -> None:
     plt.grid(True)
     plt.tight_layout()
     plt.show()
-
-
-if __name__ == "__main__":
-    # Example: Titrate 25 mL of 0.1 M HCl (acid) with 0.1 M NaOH (base)
-    # Note: The titrant's volume is provided (50 mL here) to satisfy validation,
-    # though the plotting function uses a range of added volumes.
-    hcl = Analyte("Hydrochloric Acid", volume=0.025, concentration=0.1)
-    naoh = Titrant("Sodium Hydroxide", volume=0.05, concentration=0.1)
-
-    # Plot the titration curve
-    titrate_curve_monoprotic(hcl, naoh)
