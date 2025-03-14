@@ -1,3 +1,6 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap");
+
 header,
 .starlight-header {
   background-color: rgba(255, 255, 255, 0.85) !important;
@@ -8,4 +11,26 @@ header,
   background-color: rgba(35, 38, 47, 0.85) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px); /* for Safari */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Inter", sans-serif;
+  font-weight: 900;
+  color: var(--text-color);
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  color: var(--text-color);
+}
+
+code .code {
+  font-family: "Fira Code", monospace;
+  font-weight: 400;
 }

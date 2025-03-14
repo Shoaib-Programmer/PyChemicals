@@ -1,6 +1,8 @@
 // @ts-check 
 import { defineConfig } from "astro/config"; 
 import starlight from "@astrojs/starlight"; 
+import remarkMath from "remark-math";
+import rehypeMathjax from "rehype-mathjax";
  
 export default defineConfig({ 
   image: { 
@@ -22,7 +24,7 @@ export default defineConfig({
       sidebar: [ 
         { 
           label: "Guides", 
-          items: [{ label: "Example Guide", link: "/guides/example/" }], 
+          items: [{ label: "Getting Started", link: "guides/quickstart" }], 
         }, 
         { 
           label: "Reference", 

@@ -1,0 +1,119 @@
+---
+title: Getting Started
+description: Getting Started with PyChemicals
+---
+
+Below is a **Getting Started Guide** for using PyChemicals. This guide walks you through cloning the repository, installing the package, setting up your chemical data, and loading an example acid to calculate its pH.
+
+---
+
+
+## 1. Cloning the Repository
+
+Clone the PyChemicals GitHub repository:
+
+```bash
+git clone https://github.com/Shoaib-Programmer/PyChemicals.git
+cd PyChemicals
+```
+
+
+## 2. Installation
+
+You have two options to install the package:
+
+### Standard Installation
+
+Install the package in your environment by running:
+
+```bash
+pip install .
+```
+
+### Editable Installation (For Development)
+
+If you plan on modifying the code or contributing, install in editable mode:
+
+```bash
+pip install -e .
+```
+
+This installs the package and allows you to update the code without reinstalling.
+
+## 3. Database Setup
+
+PyChemicals decouples chemical data from its computational logic by loading data from an external SQLite database. You can use PyChemicals's database, but if you want your own database, follow this schema:
+
+### Acids Table
+
+```sql
+CREATE TABLE acids (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE,
+    proticity INTEGER,
+    Ka REAL,
+    molar_mass REAL,
+    ka1 REAL,
+    ka2 REAL
+);
+```
+
+### Bases Table
+
+```sql
+CREATE TABLE bases (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE,
+    proticity INTEGER,
+    Kb REAL,
+    molar_mass REAL,
+    kb1 REAL,
+    kb2 REAL
+);
+```
+
+### Gases Table
+
+```sql
+CREATE TABLE gases (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE,
+    molar_mass REAL,
+    density REAL
+);
+```
+
+Populate these tables with your chemical data. Make sure to implement the `get_valid_acids`, `get_valid_bases`, and `get_valid_gases` functions. You can find PyChemicals's implementation [here](https://github.com/Shoaib-Programmer/PyChemicals/blob/main/PyChemicals/chemicals_db.py).
+
+## 4. Loading Chemical Data
+
+The PyChemicals library provides helper functions to load chemical data from the database. For example, to load valid acids, use the `get_valid_acids` function from the `chemicals_db` module.
+
+Here's an example of how to load data for an acid and calculate its pH:
+
+```python
+from PyChemicals.chemicals_db import get_valid_acids
+from PyChemicals.chemicals import Acid
+
+# Retrieve the acids data from the database.
+acids_data = get_valid_acids()
+
+# Get properties for a specific acid (e.g., Hydrogen Chloride).
+hcl_properties = acids_data['Hydrogen Chloride']
+
+# Create an instance of Acid with concentration (in M) and volume (in L).
+hcl = Acid("Hydrogen Chloride", properties=hcl_properties, concentration=0.1, volume=0.025)
+
+# Calculate and print the pH of the acid solution.
+print("pH of Hydrogen Chloride:", hcl.ph())
+```
+
+This snippet demonstrates:
+
+- Loading the chemical properties from the PyChemicals database.
+- Creating an `Acid` instance with a given concentration and volume.
+- Computing and printing the pH.
+
+---
+
+By following these steps, you'll have PyChemicals installed and ready to perform various chemical calculations. As you progress, you can explore additional modules (like titration calculations and titration curves) that build on this foundation.
