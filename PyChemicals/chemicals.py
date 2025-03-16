@@ -174,7 +174,7 @@ class Base(Chemical):
 
         Args:
             name (str): Name of the base.
-            properties (dict): A dictionary containing base properties 
+            properties (dict): A dictionary containing base properties
             (e.g. proticity, Kb, molar_mass, etc.).
             **kwargs: Arbitrary keyword arguments including:
                      concentration, volume, mass

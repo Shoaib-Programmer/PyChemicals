@@ -1,12 +1,19 @@
 """
 Test module for using different data sources, in this case `.csv`.
 """
+
 import csv
 import pytest
-from PyChemicals.chemicals_db import use_source, get_valid_acids, get_valid_bases, get_valid_gases
+from PyChemicals.chemicals_db import (
+    use_source,
+    get_valid_acids,
+    get_valid_bases,
+    get_valid_gases,
+)
+
 
 @pytest.fixture
-def csv_data_source(tmp_path): # pylint: disable=redefined-outer-name
+def csv_data_source(tmp_path):  # pylint: disable=redefined-outer-name
     """
     Creates a temporary directory with CSV files for acids, acid_temperatures,
     bases, base_temperatures, and gases.
@@ -24,25 +31,23 @@ def csv_data_source(tmp_path): # pylint: disable=redefined-outer-name
             f, fieldnames=["id", "name", "proticity", "Ka", "molar_mass", "ka1", "ka2"]
         )
         writer.writeheader()
-        writer.writerow({
-            "id": "1",
-            "name": "Test Acid",
-            "proticity": "1",
-            "Ka": "1e-3",
-            "molar_mass": "36.46",
-            "ka1": "1e-3",
-            "ka2": "0"
-        })
+        writer.writerow(
+            {
+                "id": "1",
+                "name": "Test Acid",
+                "proticity": "1",
+                "Ka": "1e-3",
+                "molar_mass": "36.46",
+                "ka1": "1e-3",
+                "ka2": "0",
+            }
+        )
 
     # Create sample acid_temperatures.csv.
     with acid_temps_csv.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["acid_id", "temperature", "ka"])
         writer.writeheader()
-        writer.writerow({
-            "acid_id": "1",
-            "temperature": "25",
-            "ka": "1e-3"
-        })
+        writer.writerow({"acid_id": "1", "temperature": "25", "ka": "1e-3"})
 
     # Create sample bases.csv.
     with bases_csv.open("w", newline="") as f:
@@ -50,37 +55,32 @@ def csv_data_source(tmp_path): # pylint: disable=redefined-outer-name
             f, fieldnames=["id", "name", "proticity", "Kb", "molar_mass", "kb1", "kb2"]
         )
         writer.writeheader()
-        writer.writerow({
-            "id": "1",
-            "name": "Test Base",
-            "proticity": "1",
-            "Kb": "1e-5",
-            "molar_mass": "40.00",
-            "kb1": "1e-5",
-            "kb2": "0"
-        })
+        writer.writerow(
+            {
+                "id": "1",
+                "name": "Test Base",
+                "proticity": "1",
+                "Kb": "1e-5",
+                "molar_mass": "40.00",
+                "kb1": "1e-5",
+                "kb2": "0",
+            }
+        )
 
     # Create sample base_temperatures.csv.
     with base_temps_csv.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["base_id", "temperature", "kb"])
         writer.writeheader()
-        writer.writerow({
-            "base_id": "1",
-            "temperature": "25",
-            "kb": "1e-5"
-        })
+        writer.writerow({"base_id": "1", "temperature": "25", "kb": "1e-5"})
 
     # Create sample gases.csv.
     with gases_csv.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["name", "molar_mass", "density"])
         writer.writeheader()
-        writer.writerow({
-            "name": "Test Gas",
-            "molar_mass": "28.01",
-            "density": "1.25"
-        })
+        writer.writerow({"name": "Test Gas", "molar_mass": "28.01", "density": "1.25"})
 
     return tmp_path
+
 
 def test_csv_source(csv_data_source):  # pylint: disable=redefined-outer-name
     """
