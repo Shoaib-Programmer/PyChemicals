@@ -7,7 +7,6 @@ Below is a **Getting Started Guide** for using PyChemicals. This guide walks you
 
 ---
 
-
 ## 1. Cloning the Repository
 
 Clone the PyChemicals GitHub repository:
@@ -17,10 +16,16 @@ git clone https://github.com/Shoaib-Programmer/PyChemicals.git
 cd PyChemicals
 ```
 
-
 ## 2. Installation
 
-You have two options to install the package:
+Install the dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+<br></br>
+Now, you have two options to install the package:
 
 ### Standard Installation
 
@@ -83,9 +88,17 @@ CREATE TABLE gases (
 );
 ```
 
-Populate these tables with your chemical data. Make sure to implement the `get_valid_acids`, `get_valid_bases`, and `get_valid_gases` functions. You can find PyChemicals's implementation [here](https://github.com/Shoaib-Programmer/PyChemicals/blob/main/PyChemicals/chemicals_db.py).
+You can use the following types of files for the data:
+`.db`, `.sqlite3`, `.sql`, and `.csv`.
+Populate these tables with your chemical data. Use the 'use_source' option like so:
 
-## 4. Loading Chemical Data
+```python
+import PyChemicals as pc
+
+pc.use_source('data.csv')
+```
+
+## 4. Example usage
 
 The PyChemicals library provides helper functions to load chemical data from the database. For example, to load valid acids, use the `get_valid_acids` function from the `chemicals_db` module.
 
@@ -98,19 +111,19 @@ from PyChemicals.chemicals import Acid
 # Retrieve the acids data from the database.
 acids_data = get_valid_acids()
 
-# Get properties for a specific acid (e.g., Hydrogen Chloride).
-hcl_properties = acids_data['Hydrogen Chloride']
+# Get properties for a specific acid (e.g., Hydrogen chloride).
+hcl_properties = acids_data['Hydrogen chloride']
 
 # Create an instance of Acid with concentration (in M) and volume (in L).
-hcl = Acid("Hydrogen Chloride", properties=hcl_properties, concentration=0.1, volume=0.025)
+hcl = Acid("Hydrogen chloride", properties=hcl_properties, concentration=0.1, volume=0.025)
 
 # Calculate and print the pH of the acid solution.
-print("pH of Hydrogen Chloride:", hcl.ph())
+print("pH of Hydrogen chloride:", hcl.ph())
 ```
 
 This snippet demonstrates:
 
-- Loading the chemical properties from the PyChemicals database.
+- Loading the chemical properties from the PyChemicals database (use the `use_source` option to override this).
 - Creating an `Acid` instance with a given concentration and volume.
 - Computing and printing the pH.
 
