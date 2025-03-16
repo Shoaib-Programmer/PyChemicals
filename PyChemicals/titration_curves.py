@@ -8,9 +8,6 @@ import numpy as np
 from .chemicals import Acid, Base
 from .titration_calculation import volume_of_titrant, Analyte, Titrant
 
-# Set the matplotlib backend (adjust or remove as needed)
-matplotlib.use("TkAgg")
-
 
 def calculate_ph_strong(moles_primary, moles_titrant, total_volume) -> np.ndarray:
     """
@@ -76,18 +73,22 @@ def calculate_ph_base(
     return calculate_ph_strong(moles_base, moles_acid, total_volume)
 
 
-def titrate_curve_monoprotic(analyte: Analyte, titrant: Titrant) -> None:
+def titrate_curve_monoprotic(
+    analyte: Analyte, titrant: Titrant, backend="TkAgg"
+) -> None:
     """
     Plots the titration curve for a monoprotic acid-base titration.
 
     Args:
         analyte (Analyte): The acid or base being titrated.
         titrant (Titrant): The titrant added to the analyte.
+        backend (str): The matplotlib backend to use. Defaults to "TkAgg".
 
     Raises:
         ValueError: If any required property (volume, concentration) is missing or if
                     the analyte is not an Acid or a Base.
     """
+    matplotlib.use(backend=backend)
     # Validate necessary properties
     if analyte.volume is None:
         raise ValueError("Analyte must have a defined volume.")

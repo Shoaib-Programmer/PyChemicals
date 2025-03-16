@@ -8,22 +8,19 @@ except ImportError:
     print("ImportError: Unable to import chemicals module.")
     from chemicals import Chemical, Acid, Base
 
-from . import titration_calculation
-from . import titration_curves
+# Import all contents from titration_calculation and titration_curves
+from .titration_calculation import *  # noqa: F403
+from .titration_curves import *  # noqa: F403
 
+# Define __all__ to explicitly state what gets exported
 __all__ = [
     "Chemical",
     "Acid",
     "Base",
-    "titration_calculation",
-    "titration_curves",
 ]
 
+# Get all public attributes from titration_calculation and titration_curves
+from . import titration_calculation, titration_curves
 
-def main():
-    acetic_acid = Acid(name="Acetic Acid", volume=0.25, concentration=0.1)
-    print(acetic_acid)
-
-
-if __name__ == "__main__":
-    main()
+__all__ += [name for name in dir(titration_calculation) if not name.startswith("_")]
+__all__ += [name for name in dir(titration_curves) if not name.startswith("_")]
