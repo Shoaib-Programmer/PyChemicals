@@ -1,10 +1,12 @@
 """
 This module contains all the classes for the chemicals in the PyChemicals package.
-Database handling is decoupled; chemical classes expect chemical data to be provided externally.
+Database handling is decoupled; if the user does not supply chemical properties explicitly,
+the classes will retrieve them based on the chemical name from the set data loader.
 """
 
 from typing import Dict, Any
 import numpy as np
+from .chemicals_db import get_valid_acids, get_valid_bases, get_valid_gases
 
 
 class Chemical:
@@ -17,7 +19,7 @@ class Chemical:
         Args:
             name (str): Name of the chemical.
             **kwargs: Arbitrary keyword arguments including:
-                     concentration, volume, mass, properties
+                     concentration, volume, mass
         """
         self.name = name
         self.concentration = kwargs.get("concentration")
@@ -52,19 +54,24 @@ class Chemical:
 class Acid(Chemical):
     """Class representing an acid chemical."""
 
-    def __init__(self, name: str, properties: dict, **kwargs: Dict[str, Any]):
+    def __init__(self, name: str, **kwargs: Dict[str, Any]):
         """
         Initialize an Acid instance.
 
         Args:
             name (str): Name of the acid.
-            properties (dict): A dictionary containing acid properties
-            (e.g. proticity, Ka, molar_mass, etc.).
             **kwargs: Arbitrary keyword arguments including:
-                     concentration, volume, mass
+                     concentration, volume, mass, properties
         """
-        # properties should include keys: proticity, Ka, molar_mass, optionally ka1 and ka2.
+        # If the user did not supply a properties dict, automatically load it.
+        properties = kwargs.pop("properties", None)
+        if properties is None:
+            acids_data = get_valid_acids()
+            if name not in acids_data:
+                raise ValueError(f"Unknown acid: {name} in the current data source.")
+            properties = acids_data[name]
         self.properties = properties
+
         super().__init__(name, **kwargs)
         self.proticity = properties["proticity"]
         self.ka = properties["Ka"]
@@ -109,7 +116,7 @@ class Acid(Chemical):
     ) -> float:
         """
         Calculate the temperature dependence of the equilibrium constant
-        using the van 't Hoff equation.
+        using the van't Hoff equation.
         """
         t_initial_k = t_initial + 273.15
         t_final_k = t_final + 273.15
@@ -127,9 +134,9 @@ class Acid(Chemical):
             expected_mass = self.concentration * self.volume * self.molar_mass
             if not np.isclose(self.mass, expected_mass, rtol=1e-3):
                 raise ValueError(
-                    f"""{self.volume} L of
-                    {self.concentration}M {self.name} (expected mass {expected_mass:.2f}g
-                    does not match provided mass {self.mass}g."""
+                    f"{self.volume} L of {self.concentration}M {self.name} "
+                    "(expected mass {expected_mass:.2f}g) "
+                    f"does not match provided mass {self.mass}g."
                 )
 
     def verify_acid_type(self) -> str:
@@ -168,18 +175,23 @@ class Acid(Chemical):
 class Base(Chemical):
     """Class representing a base chemical."""
 
-    def __init__(self, name: str, properties: dict, **kwargs: Dict[str, Any]):
+    def __init__(self, name: str, **kwargs: Dict[str, Any]):
         """
         Initialize a Base instance.
 
         Args:
             name (str): Name of the base.
-            properties (dict): A dictionary containing base properties
-            (e.g. proticity, Kb, molar_mass, etc.).
             **kwargs: Arbitrary keyword arguments including:
-                     concentration, volume, mass
+                     concentration, volume, mass, properties
         """
+        properties = kwargs.pop("properties", None)
+        if properties is None:
+            bases_data = get_valid_bases()
+            if name not in bases_data:
+                raise ValueError(f"Unknown base: {name} in the current data source.")
+            properties = bases_data[name]
         self.properties = properties
+
         super().__init__(name, **kwargs)
         self.proticity = properties["proticity"]
         self.kb = properties["Kb"]
@@ -198,9 +210,9 @@ class Base(Chemical):
             expected_mass = self.concentration * self.volume * self.molar_mass
             if not np.isclose(self.mass, expected_mass, rtol=1e-3):
                 raise ValueError(
-                    f"""{self.volume}L of {self.concentration}M {self.name}
-                    (expected mass {expected_mass:.2f}g)
-                    does not match provided mass {self.mass}g."""
+                    f"{self.volume} L of {self.concentration}M {self.name} "
+                    "(expected mass {expected_mass:.2f}g) "
+                    f"does not match provided mass {self.mass}g."
                 )
 
     def verify_base_type(self) -> str:
@@ -286,19 +298,23 @@ class Gas(Chemical):
 
     R = 0.0821  # Ideal gas constant in L·atm/(K·mol)
 
-    def __init__(self, name: str, properties: dict, **kwargs: Dict[str, Any]):
+    def __init__(self, name: str, **kwargs: Dict[str, Any]):
         """
         Initialize a Gas instance.
 
         Args:
             name (str): Name of the gas.
-            properties (dict): Dictionary containing gas properties (e.g., molar_mass, density).
             **kwargs: Arbitrary keyword arguments including:
-                     pressure, temperature, volume, mass
+                     pressure, temperature, volume, mass, properties
         """
+        properties = kwargs.pop("properties", None)
+        if properties is None:
+            gases_data = get_valid_gases()
+            if name not in gases_data:
+                raise ValueError(f"Unknown gas: {name} in the current data source.")
+            properties = gases_data[name]
         self.properties = properties
-        if "molar_mass" not in properties:
-            raise ValueError("Gas properties must include 'molar_mass'.")
+
         super().__init__(name, **kwargs)
         self.pressure = kwargs.get("pressure")
         self.temperature = kwargs.get("temperature")
@@ -369,21 +385,3 @@ class Gas(Chemical):
         return (
             f"{self.name}: {self.pressure} atm, {self.temperature} K, {self.volume} L"
         )
-
-
-if __name__ == "__main__":
-    try:
-        from .chemicals_db import get_valid_acids
-
-        valid_acids = get_valid_acids()
-        hcl_properties = valid_acids["Hydrogen chloride"]
-        hcl = Acid(
-            name="Hydrogen chloride",
-            properties=hcl_properties,
-            concentration=0.3,
-            volume=1.0,
-            mass=0.3 * 1.0 * hcl_properties["molar_mass"],
-        )
-        print("HCl pH:", hcl.ph())
-    except ImportError as err:
-        print("Error importing chemicals_db:", err)
