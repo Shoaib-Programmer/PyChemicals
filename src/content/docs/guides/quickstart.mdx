@@ -90,35 +90,34 @@ CREATE TABLE gases (
 
 You can use the following types of files for the data:
 `.db`, `.sqlite3`, `.sql`, and `.csv`.
-Populate these tables with your chemical data. Use the 'use_source' option like so:
+Populate them with your chemical data. Then, set the data source using the `use_source` option:
 
 ```python
 import PyChemicals as pc
 
-pc.use_source('data.csv')
+pc.use_source('data.csv') # Path to your data source
 ```
 
 ## 4. Example usage
 
-The PyChemicals library provides helper functions to load chemical data from the database. For example, to load valid acids, use the `get_valid_acids` function from the `chemicals_db` module.
-
+The chemicals library automatically loads the chemicals data from the set source.
 Here's an example of how to load data for an acid and calculate its pH:
 
 ```python
-from PyChemicals.chemicals_db import get_valid_acids
 from PyChemicals.chemicals import Acid
 
-# Retrieve the acids data from the database.
-acids_data = get_valid_acids()
-
-# Get properties for a specific acid (e.g., Hydrogen chloride).
-hcl_properties = acids_data['Hydrogen chloride']
-
 # Create an instance of Acid with concentration (in M) and volume (in L).
-hcl = Acid("Hydrogen chloride", properties=hcl_properties, concentration=0.1, volume=0.025)
+hcl = Acid("Hydrogen chloride", concentration=0.1, volume=0.025)
 
 # Calculate and print the pH of the acid solution.
 print("pH of Hydrogen chloride:", hcl.ph())
+```
+However, you can override the default data for a chemical by using the properties argument. For example:
+
+```python
+hcl = Acid("Hydrogen chloride", concentration=0.1, volume=0.025, properties={
+    ... # Properties you want to override: refer to the schema on information about how this should be structured.
+})
 ```
 
 This snippet demonstrates:
