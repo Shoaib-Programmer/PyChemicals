@@ -15,11 +15,11 @@
     "@astrojs/starlight": "^0.32.2",
     "astro": "^5.5.2",
     "rehype-mathjax": "^7.1.0",
-    "remark-math": "^6.0.0",
-    "sharp": "^0.32.5"
+    "remark-math": "^6.0.0"
   },
   "devDependencies": {
-    "gh-pages": "^6.3.0"
+    "gh-pages": "^6.3.0",
+    "sharp": "^0.33.5"
   },
   "homepage": "https://Shoaib-Programmer.github.io/PyChemicals",
   "pnpm": {
