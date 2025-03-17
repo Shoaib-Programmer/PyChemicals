@@ -4,12 +4,22 @@ build-backend = "hatchling.build"
 
 [project]
 name = "PyChemicals"
-version = "0.1.0"
+version = "0.0.1"
 authors = [
-    {name = "Your Name"}
+    {name = "Shoaib Nigam Shaik", email="shoaibnigam422@gmail.com"}
 ]
 description = "A Python package for chemical calculations"
-requires-python = ">=3.7"
+readme = "README.md"
+requires-python = ">=3.9"
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+license = "BSD-3-Clause"
+license-files = ["LICEN[CS]E*"]
+
 dependencies = [
     "numpy",
     "matplotlib",
@@ -18,7 +28,14 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=6.0",
+    "pylint",
+    "cs50"
 ]
+
+[project.urls]
+Homepage = "https://github.com/Shoaib-Programmer/PyChemicals"
+Issues = "https://github.com/Shoaib-Programmer/PyChemicals/issues"
+Docs = "https://shoaib-programmer.github.io/PyChemicals"
 
 [tool.hatch.build.targets.wheel]
 # Point to the package directory rather than the root.
