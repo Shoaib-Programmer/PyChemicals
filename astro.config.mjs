@@ -17,7 +17,7 @@ export default defineConfig({
         src: "./src/assets/logo.svg", 
         replacesTitle: true, 
       }, 
-      favicon: "./src/assets/logo.svg", 
+      favicon: "/favicon.ico", 
       social: { 
         github: "https://github.com/Shoaib-Programmer/PyChemicals", 
       }, 
