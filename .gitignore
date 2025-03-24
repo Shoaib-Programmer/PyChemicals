@@ -4,3 +4,7 @@ __pycache__/*
 **/*.pyo
 **/pylint.log
 node_modules
+dist
+.mypy_cache/**
+.pytest_cache/**
+
