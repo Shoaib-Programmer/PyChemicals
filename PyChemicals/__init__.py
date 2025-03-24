@@ -1,4 +1,23 @@
-# pylint: disable=missing-module-docstring
+"""
+PyChemicals
+
+This library provides tools, classes, and methods for handling
+common chemical entities and operations.
+
+It is designed to aid in conducting calculations and analyses for substances
+such as chemicals, acids, bases, and gases.
+
+You can find more information about the project at:
+    https://github.com/shoaib-quantumcalc/PyChemicals
+
+You can find the documentation for this library at:
+    https://shoaib-quantumcalc.github.io/PyChemicals/
+
+Author: Shoaib Nigam Shaik <shoaibnigam422@gmail.com>
+License: BSD-3-Clause
+Version: 0.0.1
+    Initial release.
+"""
 # pylint: disable=invalid-name
 # pylint: disable=missing-function-docstring
 
@@ -9,18 +28,15 @@ except ImportError:
     from chemicals import Chemical, Acid, Base
 
 # Import all contents from titration_calculation and titration_curves
-from .titration_calculation import *  # noqa: F403
-from .titration_curves import *  # noqa: F403
+from . import titration_calculation
+from .titration_curves import titrate_curve_monoprotic, volume_of_titrant  # noqa: F403
 
 # Define __all__ to explicitly state what gets exported
 __all__ = [
     "Chemical",
     "Acid",
     "Base",
+    "titration_calculation",
+    "titrate_curve_monoprotic",
+    "volume_of_titrant",
 ]
-
-# Get all public attributes from titration_calculation and titration_curves
-from . import titration_calculation, titration_curves
-
-__all__ += [name for name in dir(titration_calculation) if not name.startswith("_")]
-__all__ += [name for name in dir(titration_curves) if not name.startswith("_")]

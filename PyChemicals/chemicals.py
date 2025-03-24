@@ -4,27 +4,88 @@ Database handling is decoupled; if the user does not supply chemical properties 
 the classes will retrieve them based on the chemical name from the set data loader.
 """
 
-from typing import Dict, Any
+from typing import Dict, Optional, TypedDict
 import numpy as np
 from .chemicals_db import get_valid_acids, get_valid_bases, get_valid_gases
+
+
+# Define TypedDicts for the properties of each chemical type.
+
+
+class AcidProperties(TypedDict):
+    """
+    Type definition for acid properties.
+
+    Attributes:
+        proticity (int): Number of protons the acid can donate.
+        Ka (float): Acid dissociation constant.
+        molar_mass (float): Molar mass of the acid in g/mol.
+        ka1 (Optional[float]): First dissociation constant for polyprotic acids.
+        ka2 (Optional[float]): Second dissociation constant for polyprotic acids.
+    """
+
+    proticity: int
+    Ka: float
+    molar_mass: float
+    ka1: Optional[float]
+    ka2: Optional[float]
+
+
+class BaseProperties(TypedDict):
+    """
+    Type definition for base properties.
+
+    Attributes:
+        proticity (int): Number of protons the base can accept.
+        Kb (float): Base dissociation constant.
+        molar_mass (float): Molar mass of the base in g/mol.
+        kb1 (Optional[float]): First dissociation constant for polyprotic bases.
+        kb2 (Optional[float]): Second dissociation constant for polyprotic bases.
+    """
+
+    proticity: int
+    Kb: float
+    molar_mass: float
+    kb1: Optional[float]
+    kb2: Optional[float]
+
+
+class GasProperties(TypedDict, total=False):
+    """
+    Type definition for gas properties.
+
+    Attributes:
+        molar_mass (Optional[float]): Molar mass of the gas in g/mol.
+    """
+
+    # Gas properties may be extended if needed.
+    molar_mass: Optional[float]
 
 
 class Chemical:
     """Base class for all chemicals."""
 
-    def __init__(self, name: str, **kwargs: Dict[str, Any]):
+    def __init__(
+        self,
+        name: str,
+        *,
+        concentration: Optional[float] = None,
+        volume: Optional[float] = None,
+        mass: Optional[float] = None,
+    ) -> None:  # pylint: disable=too-many-arguments
         """
         Initialize a Chemical instance.
 
         Args:
             name (str): Name of the chemical.
-            **kwargs: Arbitrary keyword arguments including:
-                     concentration, volume, mass
+            concentration (Optional[float]): Molar concentration in M.
+            volume (Optional[float]): Volume in L.
+            mass (Optional[float]): Mass in g.
         """
         self.name = name
-        self.concentration = kwargs.get("concentration")
-        self.volume = kwargs.get("volume")
-        self.mass = kwargs.get("mass")
+        self.concentration = concentration
+        self.volume = volume
+        self.mass = mass
         self.validate()
 
     def validate(self) -> None:
@@ -54,35 +115,44 @@ class Chemical:
 class Acid(Chemical):
     """Class representing an acid chemical."""
 
-    def __init__(self, name: str, **kwargs: Dict[str, Any]):
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        name: str,
+        *,
+        concentration: Optional[float] = None,
+        volume: Optional[float] = None,
+        mass: Optional[float] = None,
+        properties: Optional[AcidProperties] = None,
+    ) -> None:
         """
         Initialize an Acid instance.
 
         Args:
             name (str): Name of the acid.
-            **kwargs: Arbitrary keyword arguments including:
-                     concentration, volume, mass, properties
+            concentration (Optional[float]): Molar concentration in M.
+            volume (Optional[float]): Volume in L.
+            mass (Optional[float]): Mass in g.
+            properties (Optional[AcidProperties]): Acid-specific properties.
         """
-        # If the user did not supply a properties dict, automatically load it.
-        properties = kwargs.pop("properties", None)
         if properties is None:
-            acids_data = get_valid_acids()
+            acids_data: Dict[str, AcidProperties] = get_valid_acids()
             if name not in acids_data:
                 raise ValueError(f"Unknown acid: {name} in the current data source.")
             properties = acids_data[name]
-        self.properties = properties
 
-        super().__init__(name, **kwargs)
-        self.proticity = properties["proticity"]
-        self.ka = properties["Ka"]
-        self.ka1 = properties.get("ka1")
-        self.ka2 = properties.get("ka2")
-        self.molar_mass = properties["molar_mass"]
+        self.properties: AcidProperties = properties
+
+        super().__init__(name, concentration=concentration, volume=volume, mass=mass)
+        self.proticity: int = properties["proticity"]
+        self.ka: float = properties["Ka"]
+        self.ka1: Optional[float] = properties.get("ka1")
+        self.ka2: Optional[float] = properties.get("ka2")
+        self.molar_mass: float = properties["molar_mass"]
         self.validate_acid()
 
     def calculate_mass(self) -> float:
         """Calculate the mass if not provided."""
-        if self.mass:
+        if self.mass is not None:
             return self.mass
         if self.concentration is None or self.volume is None:
             raise ValueError(
@@ -93,6 +163,8 @@ class Acid(Chemical):
     def h_plus(self) -> float:
         """Calculate the concentration of H+ ions."""
         if self.ka > 1:
+            if self.concentration is None:
+                raise ValueError("Concentration must be provided for strong acid.")
             return self.concentration
         if self.concentration is None:
             raise ValueError(
@@ -135,8 +207,8 @@ class Acid(Chemical):
             if not np.isclose(self.mass, expected_mass, rtol=1e-3):
                 raise ValueError(
                     f"{self.volume} L of {self.concentration}M {self.name} "
-                    "(expected mass {expected_mass:.2f}g) "
-                    f"does not match provided mass {self.mass}g."
+                    f"(expected mass {expected_mass:.2f}g) does not match provided"
+                    f"mass {self.mass}g."
                 )
 
     def verify_acid_type(self) -> str:
@@ -175,29 +247,39 @@ class Acid(Chemical):
 class Base(Chemical):
     """Class representing a base chemical."""
 
-    def __init__(self, name: str, **kwargs: Dict[str, Any]):
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        name: str,
+        *,
+        concentration: Optional[float] = None,
+        volume: Optional[float] = None,
+        mass: Optional[float] = None,
+        properties: Optional[BaseProperties] = None,
+    ) -> None:
         """
         Initialize a Base instance.
 
         Args:
             name (str): Name of the base.
-            **kwargs: Arbitrary keyword arguments including:
-                     concentration, volume, mass, properties
+            concentration (Optional[float]): Molar concentration in M.
+            volume (Optional[float]): Volume in L.
+            mass (Optional[float]): Mass in g.
+            properties (Optional[BaseProperties]): Base-specific properties.
         """
-        properties = kwargs.pop("properties", None)
         if properties is None:
-            bases_data = get_valid_bases()
+            bases_data: Dict[str, BaseProperties] = get_valid_bases()
             if name not in bases_data:
                 raise ValueError(f"Unknown base: {name} in the current data source.")
             properties = bases_data[name]
-        self.properties = properties
 
-        super().__init__(name, **kwargs)
-        self.proticity = properties["proticity"]
-        self.kb = properties["Kb"]
-        self.kb1 = properties.get("kb1")
-        self.kb2 = properties.get("kb2")
-        self.molar_mass = properties["molar_mass"]
+        self.properties: BaseProperties = properties
+
+        super().__init__(name, concentration=concentration, volume=volume, mass=mass)
+        self.proticity: int = properties["proticity"]
+        self.kb: float = properties["Kb"]
+        self.kb1: Optional[float] = properties.get("kb1")
+        self.kb2: Optional[float] = properties.get("kb2")
+        self.molar_mass: float = properties["molar_mass"]
         self.validate_base()
 
     def validate_base(self) -> None:
@@ -211,8 +293,8 @@ class Base(Chemical):
             if not np.isclose(self.mass, expected_mass, rtol=1e-3):
                 raise ValueError(
                     f"{self.volume} L of {self.concentration}M {self.name} "
-                    "(expected mass {expected_mass:.2f}g) "
-                    f"does not match provided mass {self.mass}g."
+                    f"(expected mass {expected_mass:.2f}g) does not match provided"
+                    f"mass {self.mass}g."
                 )
 
     def verify_base_type(self) -> str:
@@ -225,7 +307,7 @@ class Base(Chemical):
 
     def calculate_mass(self) -> float:
         """Calculate the mass if not provided."""
-        if self.mass:
+        if self.mass is not None:
             return self.mass
         if self.concentration is None or self.volume is None:
             raise ValueError(
@@ -236,6 +318,8 @@ class Base(Chemical):
     def oh_minus(self) -> float:
         """Calculate the concentration of OH- ions."""
         if self.kb > 1:
+            if self.concentration is None:
+                raise ValueError("Concentration must be provided for strong base.")
             return self.concentration  # Strong base: complete dissociation.
         if self.concentration is None:
             raise ValueError(
@@ -267,6 +351,8 @@ class Base(Chemical):
     def poh(self) -> float:
         """Calculate the pOH of the base."""
         if self.kb >= 1e-10:
+            if self.concentration is None:
+                raise ValueError("Concentration must be provided to calculate pOH.")
             oh_conc = self.concentration * float(self.proticity)
             return -np.log10(oh_conc)
         if self.concentration is not None:
@@ -298,26 +384,40 @@ class Gas(Chemical):
 
     R = 0.0821  # Ideal gas constant in L·atm/(K·mol)
 
-    def __init__(self, name: str, **kwargs: Dict[str, Any]):
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        name: str,
+        *,
+        concentration: Optional[float] = None,
+        volume: Optional[float] = None,
+        mass: Optional[float] = None,
+        pressure: Optional[float] = None,
+        temperature: Optional[float] = None,
+        properties: Optional[GasProperties] = None,
+    ) -> None:
         """
         Initialize a Gas instance.
 
         Args:
             name (str): Name of the gas.
-            **kwargs: Arbitrary keyword arguments including:
-                     pressure, temperature, volume, mass, properties
+            concentration (Optional[float]): Molar concentration in M (if applicable).
+            volume (Optional[float]): Volume in L.
+            mass (Optional[float]): Mass in g.
+            pressure (Optional[float]): Pressure in atm.
+            temperature (Optional[float]): Temperature in K.
+            properties (Optional[GasProperties]): Gas-specific properties.
         """
-        properties = kwargs.pop("properties", None)
         if properties is None:
-            gases_data = get_valid_gases()
+            gases_data: Dict[str, GasProperties] = get_valid_gases()
             if name not in gases_data:
                 raise ValueError(f"Unknown gas: {name} in the current data source.")
             properties = gases_data[name]
-        self.properties = properties
 
-        super().__init__(name, **kwargs)
-        self.pressure = kwargs.get("pressure")
-        self.temperature = kwargs.get("temperature")
+        self.properties: GasProperties = properties
+
+        super().__init__(name, concentration=concentration, volume=volume, mass=mass)
+        self.pressure = pressure
+        self.temperature = temperature
 
     @property
     def moles(self) -> float:
@@ -361,7 +461,8 @@ class Gas(Chemical):
             raise ValueError("Mass must be provided to calculate molar mass.")
         return self.mass / n
 
-    def partial_pressure(self, total_pressure: float, mole_fraction: float) -> float:
+    @staticmethod
+    def partial_pressure(total_pressure: float, mole_fraction: float) -> float:
         """Calculate the partial pressure of the gas in a mixture."""
         return total_pressure * mole_fraction
 
